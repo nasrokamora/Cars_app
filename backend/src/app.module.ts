@@ -11,7 +11,9 @@ import { BrandModule } from './brand/brand.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,

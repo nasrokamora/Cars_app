@@ -3,7 +3,6 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service'; // خدمة المصادقة
 import { AuthController } from './auth.controller'; // تحكم بالمسارات (routes) الخاصة بالمصادقة
-// موديول المستخدم (للوصول إلى UserService)
 import { PassportModule } from '@nestjs/passport'; // نحتاجها لتكامل Passport مع NestJS
 import { JwtModule } from '@nestjs/jwt'; // لإنشاء التوكنات JWT
 import { ConfigModule, ConfigService } from '@nestjs/config'; // لقراءة متغيّرات البيئة
