@@ -14,7 +14,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
   // دالة validate يُدعى إليها تلقائيًا عند عملية المصادقة عبر Local Strategy
   async validate(email: string, password: string): Promise<any> {
-    const user = await this.authService.validateUser({ email, password });
+    const user = await this.authService.validateUser(email, password);
     if (user == null) {
       throw new UnauthorizedException('Invalid email or password');
     }
