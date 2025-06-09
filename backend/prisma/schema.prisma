@@ -14,10 +14,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id      String   @id @default(uuid())
-  email   String   @unique
-  name    String?
+  id        Int      @id @default(autoincrement()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
+  email     String   @unique                       // عنوان البريد الإلكتروني (مفرد وحصري)
+  password  String                                   // كلمة المرور (سنخزّنها مشفّرة)
+  role      String   @default("USER")               // دور المستخدم (مثل USER أو ADMIN)
+  createdAt DateTime @default(now())                // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
+  updatedAt DateTime @updatedAt                     // تاريخ التحديث (يتغيّر تلقائيًا عند التعديل)
+}
 
+enum Role {
+  USER
+  ADMIN
 }
