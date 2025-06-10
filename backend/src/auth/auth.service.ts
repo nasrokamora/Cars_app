@@ -3,12 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-
+import { Logger } from '@nestjs/common';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
+    private readonly logger: Logger = new Logger(AuthService.name),
   ) {}
 
   // دالة للتحقق من صلاحية بيانات تسجيل الدخول (البريد وكلمة المرور)
@@ -23,6 +24,7 @@ export class AuthService {
   }
 
   // تسجيل الدخول
+
   async login(authCredentialsDto: AuthCredentialsDto) {
     const { email, password } = authCredentialsDto;
     const user = await this.validateUser(email, password);
@@ -52,13 +54,10 @@ export class AuthService {
         user,
       };
     } catch (error) {
-      if (error instanceof Error) {
-        throw new UnauthorizedException(
-          'Error creating user: ' + error.message,
-        );
-      } else {
-        throw new UnauthorizedException('Error creating user: Unknown error');
-      }
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(`signup failed: ${errorMessage}`);
+      throw new UnauthorizedException(`Error creating user: ${errorMessage}`);
     }
   }
 }
