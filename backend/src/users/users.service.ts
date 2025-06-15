@@ -12,9 +12,9 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {} // نحقن PrismaService
   // 🕵️‍♂️ **البحث عن مستخدم بواسطة البريد الإلكتروني**
   async findUserByEmail(email: string): Promise<User | null> {
-    return (await this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: { email }, // نبحث عن مستخدم بنفس البريد
-    })) as User | null;
+    });
   }
 
   // 🛠 **إنشاء مستخدم جديد**
@@ -22,9 +22,9 @@ export class UserService {
     const { email, password } = createUserDto; // نفكك البيانات من DTO
 
     // نتحقق من وجود مستخدم بنفس البريد
-    const existingUser = (await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { email }, // نبحث عن مستخدم بنفس البريد
-    })) as User | null;
+    });
     if (existingUser) {
       throw new UnauthorizedException('User with this email already exists'); // إذا وجد، نرفع خطأ
     }
