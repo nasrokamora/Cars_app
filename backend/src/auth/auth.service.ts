@@ -13,6 +13,7 @@ export class AuthService {
   ) {}
 
   // دالة للتحقق من صلاحية بيانات تسجيل الدخول (البريد وكلمة المرور)
+
   async validateUser(email: string, password: string) {
     const user = await this.userService.findUserByEmail(email); // نبحث عن المستخدم حسب البريد
     if (!user) return null; // إذا لم يكن هناك مستخدم بهذا البريد

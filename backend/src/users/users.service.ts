@@ -1,51 +1,44 @@
 // src/user/user.service.ts
 
-import { BadRequestException, Injectable } from '@nestjs/common'; // نستورد Injectable للخدمة و BadRequestException لرفع أخطاء
-import { PrismaService } from '../prisma/prisma.service'; // نستورد خدمة Prisma للتفاعل مع قاعدة البيانات
+import { Injectable, UnauthorizedException } from '@nestjs/common'; // نستورد Injectable للخدمة و BadRequestException لرفع أخطاء
+import { PrismaService } from 'src/prisma/prisma.service'; // نستورد خدمة Prisma للتفاعل مع قاعدة البيانات
 import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
 import { User } from 'generated/prisma';
 // import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {} // نحقن PrismaService
-  // 🛠 **إنشاء مستخدم جديد**
-  async createUser(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
+  // 🕵️‍♂️ **البحث عن مستخدم بواسطة البريد الإلكتروني**
+  async findUserByEmail(email: string): Promise<User | null> {
+    return (await this.prisma.user.findUnique({
+      where: { email }, // نبحث عن مستخدم بنفس البريد
+    })) as User | null;
+  }
 
-    // التحقق إن كان المستخدم موجودًا مسبقًا
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email },
-    });
+  // 🛠 **إنشاء مستخدم جديد**
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const { email, password } = createUserDto; // نفكك البيانات من DTO
+
+    // نتحقق من وجود مستخدم بنفس البريد
+    const existingUser = (await this.prisma.user.findUnique({
+      where: { email }, // نبحث عن مستخدم بنفس البريد
+    })) as User | null;
     if (existingUser) {
-      throw new BadRequestException('User already exists');
+      throw new UnauthorizedException('User with this email already exists'); // إذا وجد، نرفع خطأ
     }
-    // تشفير كلمة المرور
-    const saltRounds = 10;
-    const hashedPassword: string = await bcrypt.hash(password, saltRounds);
-    // إنشاء المستخدم في قاعدة البيانات
-    const user: User = await this.prisma.user.create({
+
+    const salt = await bcrypt.genSalt(10); // نحصل على ملح لتشفير كلمة المرور
+    const hashedPassword = await bcrypt.hash(password, salt); // نشفر كلمة المرور
+
+    // نستخدم Prisma لإنشاء مستخدم جديد
+    const newUser = await this.prisma.user.create({
       data: {
-        email,
-        password: hashedPassword,
+        ...createUserDto,
+        password: hashedPassword, // نستخدم كلمة المرور المشفرة
       },
     });
-    // إخفاء كلمة المرور عند الإرجاع
-    const { password: _pw, ...result } = user;
-    return result;
-  }
-
-  // 🔍 **العثور على مستخدم عبر المعرف (ID)**
-  async findUserByEmail(email: string): Promise<User> {
-    return await this.prisma.user.findUnique({
-      where: { email },
-    });
-  }
-  // دالة للعثور على مستخدم بحسب المعرف (ID)
-  async findUserById(id: number): Promise<User | null> {
-    return await this.prisma.user.findUnique({
-      where: { id },
-    });
+    return newUser; // نعيد المستخدم الجديد
   }
 }
