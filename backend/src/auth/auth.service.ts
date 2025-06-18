@@ -4,6 +4,7 @@ import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Logger } from '@nestjs/common';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -45,9 +46,9 @@ export class AuthService {
   }
 
   // تسجيل مستخدم جديد
-  async signup(authCredentialsDto: AuthCredentialsDto) {
+  async signup(createUserDto: CreateUserDto) {
     try {
-      const user = await this.userService.createUser(authCredentialsDto);
+      const user = await this.userService.createUser(createUserDto);
       const payload = { email: user.email, sub: user.id };
       const token = await this.jwtService.signAsync(payload);
       return {

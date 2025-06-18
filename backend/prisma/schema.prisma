@@ -15,15 +15,62 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
-  email     String   @unique                       // عنوان البريد الإلكتروني (مفرد وحصري)
-  password  String                                   // كلمة المرور (سنخزّنها مشفّرة)
-  role      String   @default("USER")               // دور المستخدم (مثل USER أو ADMIN)
-  createdAt DateTime @default(now())                // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
-  updatedAt DateTime @updatedAt                     // تاريخ التحديث (يتغيّر تلقائيًا عند التعديل)
+  id        Int       @id @default(autoincrement()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
+  email     String    @unique // عنوان البريد الإلكتروني (مفرد وحصري)
+  password  String // كلمة المرور (سنخزّنها مشفّرة)
+  role      String    @default("USER") // دور المستخدم (مثل USER أو ADMIN)
+  cars      Car[]
+  messages  Message[] @relation("UserMessages")
+  createdAt DateTime  @default(now()) // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
+  updatedAt DateTime  @updatedAt // تاريخ التحديث (يتغيّر تلقائيًا عند التعديل)
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Car {
+  id          String     @id @default(uuid())
+  title       String
+  discription String
+  price       Float
+  brand       Brand      @relation(fields: [brandId], references: [id])
+  brandId     String
+  category    Category[]
+  categoryId  String
+  images      Image[]    @relation("CarImages")
+  owner       User       @relation(fields: [ownerid], references: [id])
+  ownerid     Int
+  createdAt   DateTime   @default(now())
+  Message     Message[]
+}
+
+model Brand {
+  id   String @id @default(uuid())
+  name String @unique
+  cars Car[]
+}
+
+model Image {
+  id    String @id @default(uuid())
+  url   String
+  car   Car    @relation("CarImages", fields: [carId], references: [id])
+  carId String
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+  car  Car[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  sender    User     @relation("UserMessages", fields: [senderId], references: [id])
+  senderId  Int
+  car       Car      @relation(fields: [carId], references: [id])
+  carId     String
+  createdAt DateTime @default(now())
 }

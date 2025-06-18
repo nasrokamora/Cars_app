@@ -31,5 +31,5 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  role?: Role; // يمكن أن يكون هذا الحقل اختياريًا، إذا لم يتم تحديده سيتم تعيينه إلى 'user' افتراضيًا
+  role?: Role; // يمكن أن يكون هذا الحقل اختياريًا، إذا لم يتم تحديده سيتم تعيينه إلى 'user' افتراضيًاd
 }
