@@ -38,7 +38,6 @@ model Car {
   brand       Brand      @relation(fields: [brandId], references: [id])
   brandId     String
   category    Category[]
-  categoryId  String
   images      Image[]    @relation("CarImages")
   owner       User       @relation(fields: [ownerid], references: [id])
   ownerid     Int
