@@ -34,7 +34,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT
-  @Get('profile')
+  @Get('users/profile')
   getProfile(@Request() req: AuthenticatedRequest) {
     return {
       message: 'User profile retrieved successfully',

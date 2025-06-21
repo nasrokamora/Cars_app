@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service'; // نستورد خد�
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
 import { User } from 'generated/prisma';
+import { UpdateUserDto } from './dto/update-user.dto';
 // import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -40,5 +41,28 @@ export class UserService {
       },
     });
     return newUser; // نعيد المستخدم الجديد
+  }
+
+  async UpdateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    // نتحقق من وجود المستخدم
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id }, // نبحث عن مستخدم بنفس المعرف
+    });
+    if (!existingUser) {
+      throw new UnauthorizedException('User not found'); // إذا لم يوجد، نرفع خطأ
+    }
+
+    // إذا تم توفير كلمة مرور جديدة، نشفرها
+    const updatedData = { ...updateUserDto };
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt(10);
+      updatedData.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
+
+    // نستخدم Prisma لتحديث المستخدم
+    return await this.prisma.user.update({
+      where: { id },
+      data: updatedData,
+    });
   }
 }

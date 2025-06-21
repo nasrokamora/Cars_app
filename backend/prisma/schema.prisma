@@ -18,6 +18,7 @@ model User {
   id        Int       @id @default(autoincrement()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
   email     String    @unique // عنوان البريد الإلكتروني (مفرد وحصري)
   password  String // كلمة المرور (سنخزّنها مشفّرة)
+  username  String    @unique
   role      String    @default("USER") // دور المستخدم (مثل USER أو ADMIN)
   cars      Car[]
   messages  Message[] @relation("UserMessages")

@@ -3,14 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { Logger } from '@nestjs/common';
+// import { Logger } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly logger: Logger = new Logger(AuthService.name),
+    // private readonly logger: Logger = new Logger(AuthService.name),
   ) {}
 
   // دالة للتحقق من صلاحية بيانات تسجيل الدخول (البريد وكلمة المرور)
@@ -20,7 +20,9 @@ export class AuthService {
     if (!user) return null; // إذا لم يكن هناك مستخدم بهذا البريد
 
     const isPasswordValid = await bcrypt.compare(password, user.password); //نقارن كلمة المرور المدخلة بالنسخة المشفّرة في قاعدة البيانات:
-    if (!isPasswordValid) return null; // إذا كانت كلمة المرور خاطئة
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('wrong password'); // إذا كانت كلمة المرور خاطئة
+    } // إذا كانت كلمة المرور خاطئة
 
     return user; // إعادة البيانات بدون كلمة المرور
   }
@@ -58,7 +60,6 @@ export class AuthService {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      this.logger.error(`signup failed: ${errorMessage}`);
       throw new UnauthorizedException(`Error creating user: ${errorMessage}`);
     }
   }

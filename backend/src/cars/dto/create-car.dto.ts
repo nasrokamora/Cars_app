@@ -1,6 +1,17 @@
-import { IsArray, IsInt, IsNumber, IsUUID } from 'class-validator';
-import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsInt,
+  IsNumber,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
 
+class ImageInput {
+  @IsString()
+  url: string;
+}
 export class CreateCarDto {
   @IsString()
   title: string;
@@ -19,4 +30,9 @@ export class CreateCarDto {
 
   @IsInt()
   ownerId: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ImageInput)
+  image?: ImageInput[];
 }

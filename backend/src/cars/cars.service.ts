@@ -1,26 +1,83 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CarsService {
-  create(createCarDto: CreateCarDto) {
-    return 'This action adds a new car';
+  constructor(private readonly prisma: PrismaService) {}
+  async createCar(dto: CreateCarDto) {
+    return await this.prisma.car.create({
+      data: {
+        title: dto.title,
+        discription: dto.discription,
+        price: dto.price,
+        brand: { connect: { id: dto.brandId } },
+        category: {
+          connect: dto.categoryId.map((id) => ({ id })),
+        },
+        owner: { connect: { id: dto.ownerId } },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all cars`;
+  //  جلب جميع السيارات
+  async findAllCars() {
+    return await this.prisma.car.findMany({
+      include: {
+        brand: true,
+        category: true,
+        owner: true,
+        images: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} car`;
+  async findCarById(id: string) {
+    return await this.prisma.car.findUnique({
+      where: { id },
+      include: {
+        brand: true,
+        category: true,
+        images: true,
+        owner: true,
+        Message: true,
+      },
+    });
   }
 
-  update(id: number, updateCarDto: UpdateCarDto) {
-    return `This action updates a #${id} car`;
+  //تعديل سيارة
+  async updateCar(id: string, updateCarDto: UpdateCarDto) {
+    return await this.prisma.car.update({
+      where: { id },
+      data: {
+        title: updateCarDto.title,
+        discription: updateCarDto.discription,
+        price: updateCarDto.price,
+        brand: updateCarDto.brandId
+          ? { connect: { id: updateCarDto.brandId } }
+          : undefined,
+        category: updateCarDto.categoryId
+          ? { connect: updateCarDto.categoryId.map((id) => ({ id })) }
+          : undefined,
+        owner: updateCarDto.ownerId
+          ? { connect: { id: updateCarDto.ownerId } }
+          : undefined,
+      },
+      include: {
+        brand: true,
+        category: true,
+        images: true,
+        owner: true,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} car`;
+  //حذف سيارة
+  async deleteCar(id: string) {
+    return await this.prisma.car.delete({
+      where: { id },
+    });
   }
 }
