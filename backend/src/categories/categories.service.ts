@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -18,7 +18,7 @@ export class CategoriesService {
   }
 
   // Get all categories
-  async findAllCategories() {
+  async findAllCategories(): Promise<Category[]> {
     return await this.prisma.category.findMany({
       include: {
         car: true,
@@ -28,16 +28,23 @@ export class CategoriesService {
 
   //بحث عن فئة واحدة حسب المعرف
   async findOneCategory(id: string): Promise<Category | null> {
-    return await this.prisma.category.findUnique({
+    const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
         car: true,
       },
     });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    return category;
   }
 
   //
-  async updateCategories(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async updateCategories(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category | null> {
     return await this.prisma.category.update({
       where: { id },
       data: { name: updateCategoryDto.name },

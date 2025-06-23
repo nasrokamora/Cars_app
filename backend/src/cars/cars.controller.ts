@@ -19,7 +19,7 @@ export class CarsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createCarDto: CreateCarDto) {
+create(@Body() createCarDto: CreateCarDto) {
     return this.carsService.createCar(createCarDto);
   }
 
