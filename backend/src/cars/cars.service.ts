@@ -7,7 +7,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  
   async createCar(dto: CreateCarDto) {
     return await this.prisma.car.create({
       data: {
@@ -37,16 +36,20 @@ export class CarsService {
   }
 
   async findCarById(id: string) {
-    return await this.prisma.car.findUnique({
-      where: { id },
-      include: {
-        brand: true,
-        category: true,
-        images: true,
-        owner: true,
-        Message: true,
-      },
-    });
+    try {
+      return await this.prisma.car.findUnique({
+        where: { id },
+        include: {
+          brand: true,
+          category: true,
+          images: true,
+          owner: true,
+          Message: true,
+        },
+      });
+    } catch (error) {
+      throw new Error(`Car with ID not found ${(error as Error).message} `);
+    }
   }
 
   //تعديل سيارة

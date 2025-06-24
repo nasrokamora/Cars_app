@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Prisma } from 'generated/prisma';
+import { error } from 'console';
 
 @Controller('cars')
 export class CarsController {
@@ -19,13 +23,28 @@ export class CarsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-create(@Body() createCarDto: CreateCarDto) {
-    return this.carsService.createCar(createCarDto);
+  async createCar(@Body() createCarDto: CreateCarDto) {
+    try {
+      return await this.carsService.createCar(createCarDto);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === '2025'
+      )
+        throw new BadRequestException('Invalid data provided for car creation');
+    }
+    if (error instanceof Error) {
+      throw new InternalServerErrorException(
+        'Failed to create car',
+        error.message,
+      );
+    }
+    throw new InternalServerErrorException('Failed to create car');
   }
 
   @Get()
-  findAll() {
-    return this.carsService.findAllCars();
+  async findAll() {
+    return await this.carsService.findAllCars();
   }
 
   @Get(':id')
