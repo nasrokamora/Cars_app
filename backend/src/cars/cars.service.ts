@@ -8,7 +8,7 @@ export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createCar(dto: CreateCarDto) {
-    return await this.prisma.car.create({
+    const Car = await this.prisma.car.create({
       data: {
         title: dto.title,
         discription: dto.discription,
@@ -20,6 +20,7 @@ export class CarsService {
         owner: { connect: { id: dto.ownerId } },
       },
     });
+    return Car;
   }
 
   //  جلب جميع السيارات
