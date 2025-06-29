@@ -1,4 +1,4 @@
-import { PrismaClient } from 'generated/prisma';
+import { PrismaClient } from '../generated/prisma';
 
 const prisma = new PrismaClient();
 
@@ -70,7 +70,33 @@ async function main() {
     skipDuplicates: true, // Skip duplicates if any
   });
   console.log('Brands seeded successfully');
+
+  const categories = [
+    { name: 'SUV' },
+    { name: 'Sedan' },
+    { name: 'Hatchback' },
+    { name: 'Coupe' },
+    { name: 'Convertible' },
+    { name: 'Wagon' },
+    { name: 'Pickup Truck' },
+    { name: 'Van' },
+    { name: 'Crossover' },
+    { name: 'Sports Car' },
+    { name: 'Luxury' },
+    { name: 'Electric' },
+    { name: 'Hybrid' },
+    { name: 'Diesel' },
+    { name: 'Off-Road' },
+    { name: 'Compact' },
+  ];
+  console.log('Seeding categories...');
+  // إنشاء فئات السيارات في قاعدة البيانات
+  await prisma.category.createMany({
+    data: categories,
+    skipDuplicates: true, // Skip duplicates if any
+  });
 }
+
 // تشغيل الدالة الرئيسية ومعالجة أي خطأ قد يحدث
 main()
   .catch((e) => {
