@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from 'generated/prisma';
 
 @Injectable()
 export class CarsService {
@@ -20,6 +21,9 @@ export class CarsService {
         owner: { connect: { id: dto.ownerId } },
       },
     });
+    if (!Car) {
+      throw new NotFoundException('Car creation failed');
+    }
     return Car;
   }
 
@@ -65,7 +69,7 @@ export class CarsService {
           ? { connect: { id: updateCarDto.brandId } }
           : undefined,
         category: updateCarDto.categoryId
-          ? { connect: updateCarDto.categoryId.map((id) => ({ id })) }
+          ? { set: updateCarDto.categoryId.map((id) => ({ id })) }
           : undefined,
         owner: updateCarDto.ownerId
           ? { connect: { id: updateCarDto.ownerId } }
@@ -82,8 +86,18 @@ export class CarsService {
 
   //حذف سيارة
   async deleteCar(id: string) {
-    return await this.prisma.car.delete({
-      where: { id },
-    });
+    try {
+      return await this.prisma.car.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Car not found');
+      }
+      throw error;
+    }
   }
 }
