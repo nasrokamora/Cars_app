@@ -1,3 +1,4 @@
+import { Role } from '@prisma/client';
 import {
   IsNotEmpty,
   IsOptional,
@@ -5,7 +6,7 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { Role } from 'generated/prisma';
+
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()

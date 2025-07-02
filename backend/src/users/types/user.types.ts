@@ -1,6 +1,6 @@
 // src/users/types/user.types.ts
 
-import { User } from 'generated/prisma';
+import { User } from '@prisma/client';
 
 // نوع المستخدم بدون كلمة المرور
 export type UserWithoutPassword = Omit<User, 'password'>;

@@ -4,8 +4,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'; // نستو�
 import { PrismaService } from 'src/prisma/prisma.service'; // نستورد خدمة Prisma للتفاعل مع قاعدة البيانات
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
-import { User } from 'generated/prisma';
+
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from '@prisma/client';
 // import { PrismaClient } from '@prisma/client';
 
 @Injectable()

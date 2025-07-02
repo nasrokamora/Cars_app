@@ -14,8 +14,9 @@ import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Prisma } from 'generated/prisma';
+
 import { error } from 'console';
+import { Prisma } from '@prisma/client';
 
 @Controller('cars')
 export class CarsController {
