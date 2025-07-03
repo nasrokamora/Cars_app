@@ -84,7 +84,7 @@ This project is proprietary. **You may NOT copy, use, or redistribute any part o
 
 This project is developed by **Nasreddine Abdellouche**, a passionate full-stack developer specializing in modern web applications, AI integrations, and performance-optimized solutions.
 
-- **GitHub:** [Nasreddine](https://github.com/nasrokamora)
+- **GitHub:** [nasrokamora](https://github.com/nasrokamora)
 - **LinkedIn:** [Nasreddine AB](https://www.linkedin.com/in/nasdev)
 - **Portfolio:** [nasreddine-abdellouche.vercel.app](https://nasreddine-abdellouche.vercel.app)
 - **Email:** nasreddine-ab@outlook.com
