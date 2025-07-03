@@ -63,3 +63,7 @@ CarHub uses **TensorFlow.js** and custom ML models to:
 
 ---
 
+## 🏗️ Project Structure
+
+/backend          NestJS + Prisma APIs /frontend         Next.js frontend app /prisma           Schema and migrations /ai               TensorFlow.js models and scripts
+
