@@ -53,11 +53,13 @@ export class CarsController {
     return this.carsService.findCarById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCarDto: UpdateCarDto) {
     return this.carsService.updateCar(id, updateCarDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.carsService.deleteCar(id);

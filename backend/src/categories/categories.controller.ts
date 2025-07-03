@@ -1,45 +1,42 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Post()
-  async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
-    return await this.categoriesService.createCategory(createCategoryDto);
-  }
-
+  // This endpoint allows the creation of a new category.
   @Get()
   async findAllCategories() {
-    return await this.categoriesService.findAllCategories();
+    try {
+      return await this.categoriesService.findAllCategories();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new InternalServerErrorException(
+        'An error occurred while fetching categories',
+        errorMessage,
+      );
+    }
   }
 
+  // This endpoint allows fetching a single category by its ID.
   @Get(':id')
   async findOneCategory(@Param('id') id: string) {
-    return await this.categoriesService.findOneCategory(id);
-  }
-
-  @Patch(':id')
-  async updateCategories(
-    @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
-  ) {
-    return await this.categoriesService.updateCategories(id, updateCategoryDto);
-  }
-
-  @Delete(':id')
-  async removeCategory(@Param('id') id: string) {
-    return await this.categoriesService.removeCategory(id);
+    try {
+      return await this.categoriesService.findOneCategory(id);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new InternalServerErrorException(
+        'An error occurred while fetching the category',
+        errorMessage,
+      );
+    }
   }
 }

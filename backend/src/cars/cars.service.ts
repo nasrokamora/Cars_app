@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Car, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createCar(dto: CreateCarDto) {
+  async createCar(dto: CreateCarDto): Promise<Car> {
     const Car = await this.prisma.car.create({
       data: {
         title: dto.title,
@@ -30,6 +30,8 @@ export class CarsService {
   //  جلب جميع السيارات
   async findAllCars() {
     return await this.prisma.car.findMany({
+      skip: 0,
+      take: 20,
       include: {
         brand: true,
         category: true,
