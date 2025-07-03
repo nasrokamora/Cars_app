@@ -103,7 +103,6 @@ This project is developed by **Nasreddine Abdellouche**, a passionate full-stack
 
 ## 🌐 Live Demo
 
-Coming Soon   
 
 **Coming Soon... Stay Tuned!**
 
