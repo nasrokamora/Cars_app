@@ -12,6 +12,8 @@ export class MessagesService {
     return await this.prisma.message.create({
       data: {
         content: createMessageDto.content,
+        sender: { connect: { id: createMessageDto.senderId } },
+        car: { connect: { id: createMessageDto.carId } },
       },
     });
   }
