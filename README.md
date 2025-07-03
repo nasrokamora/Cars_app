@@ -91,3 +91,19 @@ This project is developed by **Nasreddine Abdellouche**, a passionate full-stack
 - **Email:** Nas_dev@outlook.com
 - **Email:** nanim2@outlook.fr
 
+---
+
+## 🌟 Project Vision
+
+**CarHub** aims to revolutionize the way vehicles are bought and sold in Algeria by blending cutting-edge web technologies and artificial intelligence.
+
+> **Explore. Discover. Drive Smart.**
+
+---
+
+## 🌐 Live Demo
+
+Coming Soon   
+
+**Coming Soon... Stay Tuned!**
+
