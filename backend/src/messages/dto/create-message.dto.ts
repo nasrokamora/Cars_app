@@ -6,9 +6,7 @@ export class CreateMessageDto {
   @IsString()
   content: string;
 
+  @IsNotEmpty()
   @IsUUID()
-  senderId: number;
-
-  @IsUUID()
-  carId: number;
+  carId: string;
 }

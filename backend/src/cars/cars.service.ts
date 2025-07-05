@@ -28,18 +28,30 @@ export class CarsService {
   }
 
   //  جلب جميع السيارات
-  async findAllCars() {
-    return await this.prisma.car.findMany({
-      skip: 0,
-      take: 20,
-      include: {
-        brand: true,
-        category: true,
-        owner: true,
-        images: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAllCars(page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const [cars, total] = await this.prisma.$transaction([
+      this.prisma.car.findMany({
+        skip,
+        take: limit,
+        include: {
+          brand: true,
+          category: true,
+          images: true,
+          owner: true,
+          Message: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.car.count(),
+    ]);
+
+    return {
+      cars,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async findCarById(id: string) {

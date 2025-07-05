@@ -9,6 +9,7 @@ import {
   UseGuards,
   BadRequestException,
   InternalServerErrorException,
+  Query,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -43,9 +44,22 @@ export class CarsController {
     throw new InternalServerErrorException('Failed to create car');
   }
 
+  //وجلب جميع السيارات
+  // Pagination is implemented with default values for page and limit
+  // If no page or limit is provided, it defaults to page 1 and limit 20
+  // If invalid values are provided, it throws a BadRequestException
+  // If page or limit is less than 1, it throws a BadRequestException
   @Get()
-  async findAll() {
-    return await this.carsService.findAllCars();
+  async findAll(@Query('page') page: string, @Query('limit') limit: string) {
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 20;
+    if (isNaN(pageNumber) || isNaN(limitNumber)) {
+      throw new BadRequestException('Invalid page or limit parameter');
+    }
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new BadRequestException('Page and limit must be greater than 0');
+    }
+    return await this.carsService.findAllCars(pageNumber, limitNumber);
   }
 
   @Get(':id')
