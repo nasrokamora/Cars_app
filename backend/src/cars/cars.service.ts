@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Car, Prisma } from '@prisma/client';
+import { Car } from '@prisma/client';
 
 @Injectable()
 export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createCar(dto: CreateCarDto): Promise<Car> {
+  async createCar(dto: CreateCarDto, ownerId: number): Promise<Car> {
     const Car = await this.prisma.car.create({
       data: {
         title: dto.title,
@@ -18,7 +18,13 @@ export class CarsService {
         category: {
           connect: dto.categoryId.map((id) => ({ id })),
         },
-        owner: { connect: { id: dto.ownerId } },
+        owner: { connect: { id: ownerId } },
+      },
+      include: {
+        brand: true,
+        category: true,
+        images: true,
+        owner: { select: { id: true, username: true } },
       },
     });
     if (!Car) {
@@ -38,7 +44,7 @@ export class CarsService {
           brand: true,
           category: true,
           images: true,
-          owner: true,
+          owner: { select: { id: true, username: true } },
           Message: true,
         },
         orderBy: { createdAt: 'desc' },
@@ -55,24 +61,34 @@ export class CarsService {
   }
 
   async findCarById(id: string) {
-    try {
-      return await this.prisma.car.findUnique({
-        where: { id },
-        include: {
-          brand: true,
-          category: true,
-          images: true,
-          owner: true,
-          Message: true,
-        },
-      });
-    } catch (error) {
-      throw new Error(`Car with ID not found ${(error as Error).message} `);
+    const car = await this.prisma.car.findUnique({
+      where: { id },
+      include: {
+        brand: true,
+        category: true,
+        images: true,
+        owner: { select: { id: true, username: true } },
+        Message: true,
+      },
+    });
+    if (!car) {
+      throw new NotFoundException('Car not found');
     }
+    return car;
   }
 
   //تعديل سيارة
-  async updateCar(id: string, updateCarDto: UpdateCarDto) {
+  async updateCar(id: string, updateCarDto: UpdateCarDto, userId: number) {
+    const car = await this.prisma.car.findUnique({
+      where: { id },
+      select: { ownerid: true },
+    });
+    if (!car) {
+      throw new NotFoundException('Car not found');
+    }
+    if (car.ownerid !== userId) {
+      throw new NotFoundException('You are not authorized to update this car');
+    }
     return await this.prisma.car.update({
       where: { id },
       data: {
@@ -85,33 +101,28 @@ export class CarsService {
         category: updateCarDto.categoryId
           ? { set: updateCarDto.categoryId.map((id) => ({ id })) }
           : undefined,
-        owner: updateCarDto.ownerId
-          ? { connect: { id: updateCarDto.ownerId } }
-          : undefined,
       },
       include: {
         brand: true,
         category: true,
-        images: true,
-        owner: true,
       },
     });
   }
 
   //حذف سيارة
-  async deleteCar(id: string) {
-    try {
-      return await this.prisma.car.delete({
-        where: { id },
-      });
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException('Car not found');
-      }
-      throw error;
+  async deleteCar(id: string, userId: number) {
+    const deletedCar = await this.prisma.car.findUnique({
+      where: { id },
+      select: { ownerid: true },
+    });
+    if (!deletedCar) {
+      throw new NotFoundException('Car not found');
     }
+    if (deletedCar.ownerid !== userId) {
+      throw new NotFoundException('You are not authorized to delete this car');
+    }
+    return await this.prisma.car.delete({
+      where: { id },
+    });
   }
 }

@@ -8,16 +8,14 @@ import {
   Delete,
   UseGuards,
   BadRequestException,
-  InternalServerErrorException,
   Query,
+  Req,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-
-import { error } from 'console';
-import { Prisma } from '@prisma/client';
+import { AuthenticatedRequest } from 'src/auth/types/authenticatedReq.type';
 
 @Controller('cars')
 export class CarsController {
@@ -25,30 +23,18 @@ export class CarsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createCar(@Body() createCarDto: CreateCarDto) {
-    try {
-      return await this.carsService.createCar(createCarDto);
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === '2025'
-      )
-        throw new BadRequestException('Invalid data provided for car creation');
+  async createCar(
+    @Body() createCarDto: CreateCarDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('User not authenticated');
     }
-    if (error instanceof Error) {
-      throw new InternalServerErrorException(
-        'Failed to create car',
-        error.message,
-      );
-    }
-    throw new InternalServerErrorException('Failed to create car');
+    return await this.carsService.createCar(createCarDto, userId);
   }
 
   //وجلب جميع السيارات
-  // Pagination is implemented with default values for page and limit
-  // If no page or limit is provided, it defaults to page 1 and limit 20
-  // If invalid values are provided, it throws a BadRequestException
-  // If page or limit is less than 1, it throws a BadRequestException
   @Get()
   async findAll(@Query('page') page: string, @Query('limit') limit: string) {
     const pageNumber = parseInt(page, 10) || 1;
@@ -62,20 +48,35 @@ export class CarsController {
     return await this.carsService.findAllCars(pageNumber, limitNumber);
   }
 
+  //جلب سيارة واحدة
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.carsService.findCarById(id);
+  async findOne(@Param('id') id: string) {
+    return await this.carsService.findCarById(id);
   }
 
+  // تحديث سيارة
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCarDto: UpdateCarDto) {
-    return this.carsService.updateCar(id, updateCarDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateCarDto: UpdateCarDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('User not authenticated');
+    }
+
+    return await this.carsService.updateCar(id, updateCarDto, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.carsService.deleteCar(id);
+  async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('User not authenticated');
+    }
+    return await this.carsService.deleteCar(id, userId);
   }
 }

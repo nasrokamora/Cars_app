@@ -1,7 +1,6 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsInt,
   IsNumber,
   IsString,
   IsUUID,
@@ -28,8 +27,8 @@ export class CreateCarDto {
   @IsUUID('all', { each: true })
   categoryId: string[]; // many-to-many
 
-  @IsInt()
-  ownerId: number;
+  // @IsInt()
+  // ownerId: number;
 
   @IsArray()
   @ValidateNested({ each: true })
