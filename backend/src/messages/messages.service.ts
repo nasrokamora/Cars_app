@@ -22,11 +22,11 @@ export class MessagesService {
     });
   }
 
-  async findAllMessages(carId: string, page = 1, limit = 20) {
+  async findAllMessages(senderId: string, page = 1, limit = 20) {
     const skip = (page - 1) * limit;
     const [messages, total] = await this.prisma.$transaction([
       this.prisma.message.findMany({
-        where: { carId },
+        where: { senderId },
         skip,
         take: limit,
         include: {
@@ -35,7 +35,7 @@ export class MessagesService {
         },
       }),
       this.prisma.message.count({
-        where: { carId },
+        where: { senderId },
       }),
     ]);
     return {
