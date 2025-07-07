@@ -22,28 +22,27 @@ export class MessagesService {
     });
   }
 
-  async findAllMessages(senderId: string, page = 1, limit = 20) {
+  async findAllMessages(
+    senderId: number,
+    page = 1,
+    limit = 20,
+  ): Promise<MessageResponseDto[]> {
     const skip = (page - 1) * limit;
-    const [messages, total] = await this.prisma.$transaction([
+    const [messages] = await this.prisma.$transaction([
       this.prisma.message.findMany({
         where: { senderId },
         skip,
         take: limit,
         include: {
-          sender: true,
-          car: true,
+          sender: { select: { id: true, username: true } },
+          car: { select: { id: true, title: true, price: true } },
         },
       }),
       this.prisma.message.count({
         where: { senderId },
       }),
     ]);
-    return {
-      data: messages,
-      total,
-      page,
-      lastPage: Math.ceil(total / limit),
-    };
+    return messages;
   }
 
   async findOneMessage(id: string): Promise<MessageResponseDto | null> {
