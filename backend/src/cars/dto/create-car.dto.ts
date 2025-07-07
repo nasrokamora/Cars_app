@@ -27,9 +27,6 @@ export class CreateCarDto {
   @IsUUID('all', { each: true })
   categoryId: string[]; // many-to-many
 
-  // @IsInt()
-  // ownerId: number;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ImageInput)
