@@ -8,6 +8,9 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
+  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -15,7 +18,7 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/types/authenticatedReq.type';
 
-@Controller('messages')
+@Controller('api/messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
@@ -25,30 +28,66 @@ export class MessagesController {
     @Body() createMessageDto: CreateMessageDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    const user = req.user as { userId: number };
-    return this.messagesService.createMessage({
-      ...createMessageDto,
-      senderId: user.userId,
-    });
+    const senderId = req.user?.userId;
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.messagesService.createMessage(createMessageDto, senderId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.messagesService.findAll();
+  findAllMessages(
+    @Req() req: AuthenticatedRequest,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ) {
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 20;
+    if (isNaN(pageNumber) || isNaN(limitNumber)) {
+      throw new BadRequestException('Invalid page or limit parameter');
+    }
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new BadRequestException('Page and limit must be greater than 0');
+    }
+    const senderId = req.user?.userId;
+
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.messagesService.findAllMessages(
+      senderId,
+      pageNumber,
+      limitNumber,
+    );
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.messagesService.findOne(+id);
+    return this.messagesService.findOneMessage(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(+id, updateMessageDto);
+  update(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() updateMessageDto: UpdateMessageDto,
+  ) {
+    const senderId = req.user?.userId;
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.messagesService.updateMessage(id, updateMessageDto, senderId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messagesService.remove(+id);
+  remove(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const senderId = req.user?.userId;
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.messagesService.deleteMessage(id, senderId);
   }
 }
