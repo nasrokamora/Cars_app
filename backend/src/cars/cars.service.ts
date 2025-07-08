@@ -3,11 +3,30 @@ import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Car } from '@prisma/client';
+import { CarResponseDto } from './dto/car-response.dto';
 
 @Injectable()
 export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // private MapToResponseCarDto(
+  //   car: Car & {
+  //     owner: { id: number; username: string };
+  //     brand: { id: string; name: string };
+  //     category: { id: string; name: string };
+  //     images: string[];
+  //   },
+  // ): CarResponseDto {
+  //   return {
+  //     id: car.id,
+  //     title: car.title,
+  //     discription: car.discription,
+  //     price: car.price,
+  //     brand: car.brand.name,
+  //     category: car.category.map((category) => category.name),
+  //     image: car.images,
+  //   };
+  // }
   async createCar(dto: CreateCarDto, ownerId: number): Promise<Car> {
     const Car = await this.prisma.car.create({
       data: {
@@ -20,12 +39,6 @@ export class CarsService {
         },
         owner: { connect: { id: ownerId } },
       },
-      include: {
-        brand: true,
-        category: true,
-        images: true,
-        owner: { select: { id: true, username: true } },
-      },
     });
     if (!Car) {
       throw new NotFoundException('Car creation failed');
@@ -34,10 +47,18 @@ export class CarsService {
   }
 
   //  جلب جميع السيارات
-  async findAllCars(page = 1, limit = 20) {
+  async findAllCars(
+    page = 1,
+    limit = 20,
+    ownerId: number,
+  ): Promise<{
+    data: CarResponseDto;
+    meta: { page: number; limit: number; total: number };
+  }> {
     const skip = (page - 1) * limit;
     const [cars, total] = await this.prisma.$transaction([
       this.prisma.car.findMany({
+        where:{id},
         skip,
         take: limit,
         include: {
@@ -49,14 +70,17 @@ export class CarsService {
         },
         orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.car.count(),
+      this.prisma.car.count({
+        where: { ownerid: ownerId },
+      }),
     ]);
-
     return {
-      cars,
-      total,
-      page,
-      lastPage: Math.ceil(total / limit),
+      data: cars,
+      meta: {
+        page,
+        limit,
+        total,
+      },
     };
   }
 
