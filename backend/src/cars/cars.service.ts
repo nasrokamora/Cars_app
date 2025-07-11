@@ -4,6 +4,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Car } from '@prisma/client';
 import { CarResponseDto } from './dto/car-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CarsService {
@@ -27,6 +28,7 @@ export class CarsService {
   //     image: car.images,
   //   };
   // }
+
   async createCar(dto: CreateCarDto, ownerId: number): Promise<Car> {
     const Car = await this.prisma.car.create({
       data: {
@@ -50,32 +52,30 @@ export class CarsService {
   async findAllCars(
     page = 1,
     limit = 20,
-    ownerId: number,
   ): Promise<{
-    data: CarResponseDto;
+    data: CarResponseDto[];
     meta: { page: number; limit: number; total: number };
   }> {
     const skip = (page - 1) * limit;
     const [cars, total] = await this.prisma.$transaction([
       this.prisma.car.findMany({
-        where:{id},
         skip,
         take: limit,
         include: {
           brand: true,
           category: true,
           images: true,
-          owner: { select: { id: true, username: true } },
+          owner: { select: { username: true } },
           Message: true,
         },
         orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.car.count({
-        where: { ownerid: ownerId },
-      }),
+      this.prisma.car.count(),
     ]);
     return {
-      data: cars,
+      data: plainToInstance(CarResponseDto, cars, {
+        excludeExtraneousValues: true,
+      }),
       meta: {
         page,
         limit,
