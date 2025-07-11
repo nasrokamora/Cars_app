@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المر
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
-// import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class UserService {

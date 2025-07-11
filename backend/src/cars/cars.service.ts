@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -85,7 +89,7 @@ export class CarsService {
   }
 
   //تعديل سيارة
-  async updateCar(id: string, updateCarDto: UpdateCarDto, userId: number) {
+  async updateCar(id: string, updateCarDto: UpdateCarDto, ownerId: number) {
     const car = await this.prisma.car.findUnique({
       where: { id },
       select: { ownerid: true },
@@ -93,8 +97,8 @@ export class CarsService {
     if (!car) {
       throw new NotFoundException('Car not found');
     }
-    if (car.ownerid !== userId) {
-      throw new NotFoundException('You are not authorized to update this car');
+    if (car.ownerid !== ownerId) {
+      throw new ForbiddenException('You are not authorized to update this car');
     }
     return await this.prisma.car.update({
       where: { id },
@@ -117,7 +121,7 @@ export class CarsService {
   }
 
   //حذف سيارة
-  async deleteCar(id: string, userId: number) {
+  async deleteCar(id: string, ownerId: number) {
     const deletedCar = await this.prisma.car.findUnique({
       where: { id },
       select: { ownerid: true },
@@ -125,8 +129,8 @@ export class CarsService {
     if (!deletedCar) {
       throw new NotFoundException('Car not found');
     }
-    if (deletedCar.ownerid !== userId) {
-      throw new NotFoundException('You are not authorized to delete this car');
+    if (deletedCar.ownerid !== ownerId) {
+      throw new ForbiddenException('You are not authorized to delete this car');
     }
     return await this.prisma.car.delete({
       where: { id },

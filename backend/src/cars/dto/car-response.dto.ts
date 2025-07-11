@@ -7,6 +7,22 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+export class ImageDto {
+  @Expose()
+  @IsString()
+  id: string;
+
+  @Expose()
+  @IsString()
+  url: string;
+}
+
+export class OwnerDto {
+  @Expose()
+  @IsString()
+  username: string; //  لا يوجد id
+}
+
 export class CarResponseDto {
   @Expose()
   @IsString()
@@ -52,20 +68,4 @@ export class CarResponseDto {
   @ValidateNested()
   @Type(() => OwnerDto)
   owner: OwnerDto;
-}
-
-export class ImageDto {
-  @Expose()
-  @IsString()
-  id: string;
-
-  @Expose()
-  @IsString()
-  url: string;
-}
-
-export class OwnerDto {
-  @Expose()
-  @IsString()
-  username: string; //  لا يوجد id
 }

@@ -69,10 +69,10 @@ export class CarsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
-    const userId = req.user?.userId;
-    if (!userId) {
+    const ownerId = req.user?.userId;
+    if (!ownerId) {
       throw new BadRequestException('User not authenticated');
     }
-    return await this.carsService.deleteCar(id, userId);
+    return await this.carsService.deleteCar(id, ownerId);
   }
 }
