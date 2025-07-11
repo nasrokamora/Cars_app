@@ -8,8 +8,9 @@ import {
   Delete,
   UseGuards,
   BadRequestException,
-  Query,
   Req,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -35,17 +36,10 @@ export class CarsController {
   }
 
   //وجلب جميع السيارات
-  @Get()
-  async findAll(@Query('page') page: string, @Query('limit') limit: string) {
-    const pageNumber = parseInt(page, 10) || 1;
-    const limitNumber = parseInt(limit, 10) || 20;
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new BadRequestException('Invalid page or limit parameter');
-    }
-    if (pageNumber < 1 || limitNumber < 1) {
-      throw new BadRequestException('Page and limit must be greater than 0');
-    }
-    return await this.carsService.findAllCars(pageNumber, limitNumber);
+  @Get('/allcars')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async findAll() {
+    return await this.carsService.findAllCars();
   }
 
   //جلب سيارة واحدة
@@ -69,6 +63,8 @@ export class CarsController {
 
     return await this.carsService.updateCar(id, updateCarDto, userId);
   }
+
+  // حذف سيارة
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
