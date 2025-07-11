@@ -24,15 +24,15 @@ export class CarsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createCar(
+  async create(
     @Body() createCarDto: CreateCarDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    const userId = req.user?.userId;
-    if (!userId) {
+    const ownerId = req.user?.userId;
+    if (!ownerId) {
       throw new BadRequestException('User not authenticated');
     }
-    return await this.carsService.createCar(createCarDto, userId);
+    return await this.carsService.createCar(createCarDto, ownerId);
   }
 
   //وجلب جميع السيارات
@@ -56,12 +56,12 @@ export class CarsController {
     @Body() updateCarDto: UpdateCarDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    const userId = req.user?.userId;
-    if (!userId) {
+    const ownerId = req.user?.userId;
+    if (!ownerId) {
       throw new BadRequestException('User not authenticated');
     }
 
-    return await this.carsService.updateCar(id, updateCarDto, userId);
+    return await this.carsService.updateCar(id, updateCarDto, ownerId);
   }
 
   // حذف سيارة

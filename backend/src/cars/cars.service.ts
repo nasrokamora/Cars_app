@@ -10,25 +10,6 @@ import { plainToInstance } from 'class-transformer';
 export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // private MapToResponseCarDto(
-  //   car: Car & {
-  //     owner: { id: number; username: string };
-  //     brand: { id: string; name: string };
-  //     category: { id: string; name: string };
-  //     images: string[];
-  //   },
-  // ): CarResponseDto {
-  //   return {
-  //     id: car.id,
-  //     title: car.title,
-  //     discription: car.discription,
-  //     price: car.price,
-  //     brand: car.brand.name,
-  //     category: car.category.map((category) => category.name),
-  //     image: car.images,
-  //   };
-  // }
-
   async createCar(dto: CreateCarDto, ownerId: number): Promise<Car> {
     const Car = await this.prisma.car.create({
       data: {
@@ -84,21 +65,23 @@ export class CarsService {
     };
   }
 
-  async findCarById(id: string) {
+  async findCarById(id: string): Promise<CarResponseDto> {
     const car = await this.prisma.car.findUnique({
       where: { id },
       include: {
         brand: true,
         category: true,
         images: true,
-        owner: { select: { id: true, username: true } },
+        owner: { select: { username: true } },
         Message: true,
       },
     });
     if (!car) {
       throw new NotFoundException('Car not found');
     }
-    return car;
+    return plainToInstance(CarResponseDto, car, {
+      excludeExtraneousValues: true,
+    });
   }
 
   //تعديل سيارة
