@@ -28,10 +28,7 @@ export class AuthController {
   @Post('login')
   async login(@Request() req: { user: { email: string; password: string } }) {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
-    return await this.authService.login({
-      email: req.user.email,
-      password: req.user.password, // تأكد من أن كلمة المرور موجودة في req.user
-    });
+    return await this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT

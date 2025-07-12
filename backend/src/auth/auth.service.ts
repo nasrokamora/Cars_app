@@ -19,6 +19,7 @@ export class AuthService {
     if (!user) return null; // إذا لم يكن هناك مستخدم بهذا البريد
 
     const isPasswordValid = await bcrypt.compare(password, user.password); //نقارن كلمة المرور المدخلة بالنسخة المشفّرة في قاعدة البيانات:
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('wrong password'); // إذا كانت كلمة المرور خاطئة
     } // إذا كانت كلمة المرور خاطئة
