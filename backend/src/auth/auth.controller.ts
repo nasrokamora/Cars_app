@@ -27,9 +27,9 @@ export class AuthController {
   // مسار تسجيل الدخول (Login) باستخدام الحارس المحلي (LocalAuthGuard)
   @UseGuards(LocalAuthGuard) // هذا الحارس يحقّق البريد وكلمة المرور أولًا
   @Post('login')
-  async login(@Req() req: AuthenticatedUserRequest) {
+  login(@Req() req: AuthenticatedUserRequest) {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
-    return await this.authService.login(req.user);
+    return this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT
