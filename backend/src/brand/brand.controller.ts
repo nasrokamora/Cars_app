@@ -6,11 +6,13 @@ import {
   Post,
   Body,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { Roles } from 'src/auth/decorators/rols.decorator';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { Role } from 'src/auth/interface/Role.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 // import { CreateBrandDto } from './dto/create-brand.dto';
 
 @Controller('brands')
@@ -46,6 +48,7 @@ export class BrandController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @Roles(Role.ADMIN)
   async createBrand(@Body() createBrandDto: CreateBrandDto) {
@@ -61,6 +64,7 @@ export class BrandController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @Roles(Role.ADMIN)
   async remove(@Param('id') id: string) {
