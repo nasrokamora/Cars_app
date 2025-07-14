@@ -17,6 +17,11 @@ export class UserService {
       where: { email }, // نبحث عن مستخدم بنفس البريد
     });
   }
+  async findUserById(id: number): Promise<User | null> {
+    return await this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
 
   // 🛠 **إنشاء مستخدم جديد**
   async createUser(createUserDto: CreateUserDto): Promise<User> {

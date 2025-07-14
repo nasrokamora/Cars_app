@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -10,7 +11,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
-import { AuthenticatedRequest } from './types/authenticatedReq.type';
+import { AuthenticatedUserRequest } from './types/authenticatedReq.type';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -26,14 +27,14 @@ export class AuthController {
   // مسار تسجيل الدخول (Login) باستخدام الحارس المحلي (LocalAuthGuard)
   @UseGuards(LocalAuthGuard) // هذا الحارس يحقّق البريد وكلمة المرور أولًا
   @Post('login')
-  async login(@Request() req: { user: { email: string; password: string } }) {
+  async login(@Req() req: AuthenticatedUserRequest) {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
     return await this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT
   @Get('/profile')
-  getProfile(@Request() req: AuthenticatedRequest) {
+  getProfile(@Request() req: AuthenticatedUserRequest) {
     return {
       message: 'User profile retrieved successfully',
       user: req.user,

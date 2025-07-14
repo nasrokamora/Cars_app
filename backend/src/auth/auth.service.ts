@@ -1,9 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { User } from '@prisma/client';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -21,7 +27,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password); //نقارن كلمة المرور المدخلة بالنسخة المشفّرة في قاعدة البيانات:
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('wrong password'); // إذا كانت كلمة المرور خاطئة
+      throw new UnauthorizedException(' Invalid password'); // إذا كانت كلمة المرور خاطئة
     } // إذا كانت كلمة المرور خاطئة
 
     return user; // إعادة البيانات بدون كلمة المرور
@@ -29,14 +35,12 @@ export class AuthService {
 
   // تسجيل الدخول
 
-  async login(authCredentialsDto: AuthCredentialsDto) {
-    const { email, password } = authCredentialsDto;
-    const user = await this.validateUser(email, password);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+  login(user: User) {
+    if (!user) throw new BadGatewayException('Invalid credentials');
 
     const payload = { email: user.email, sub: user.id };
     // 2. إعداد الحمولة Payload للتوكن
-    const token = await this.jwtService.signAsync(payload);
+    const token = this.jwtService.sign(payload);
     return {
       accessToken: token,
       user: {

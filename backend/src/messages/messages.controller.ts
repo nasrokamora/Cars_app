@@ -29,7 +29,7 @@ export class MessagesController {
     @Req() req: AuthenticatedRequest,
   ) {
     const senderId = req.user?.userId;
-    if (!req.user?.userId) {
+    if (!req.user.userId) {
       throw new UnauthorizedException('User not authenticated');
     }
     return this.messagesService.createMessage(createMessageDto, senderId);

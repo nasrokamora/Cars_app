@@ -12,9 +12,9 @@ async function bootstrap() {
     }),
   );
   await app.listen(process.env.PORT ?? 3000);
-  // const plain = 'test1234';
-  // const hash = '$2b$10$XXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // من DB
-  // const match = await bcrypt.compare(plain, hash);
-  // console.log('MATCH?', match); // يجب أن تكون true
+  // // const plain = 'test1234';
+  // // const hash = '$2b$10$XXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // من DB
+  // // const match = await bcrypt.compare(plain, hash);
+  // // console.log('MATCH?', match); // يجب أن تكون true
 }
 void bootstrap();
