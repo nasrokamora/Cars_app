@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
+  id        String    @id @default(uuid()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
   email     String    @unique // عنوان البريد الإلكتروني (مفرد وحصري)
   password  String // كلمة المرور (سنخزّنها مشفّرة)
   username  String    @unique
@@ -41,7 +41,7 @@ model Car {
   category    Category[]
   images      Image[]    @relation("CarImages")
   owner       User       @relation(fields: [ownerid], references: [id])
-  ownerid     Int
+  ownerid     String
   createdAt   DateTime   @default(now())
   Message     Message[]
 }
@@ -69,7 +69,7 @@ model Message {
   id        String   @id @default(uuid())
   content   String   @db.Text
   sender    User     @relation("UserMessages", fields: [senderId], references: [id])
-  senderId  Int
+  senderId  String
   car       Car      @relation(fields: [carId], references: [id])
   carId     String
   createdAt DateTime @default(now())

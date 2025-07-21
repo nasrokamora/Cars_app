@@ -17,7 +17,7 @@ export class UserService {
       where: { email }, // نبحث عن مستخدم بنفس البريد
     });
   }
-  async findUserById(id: number): Promise<User | null> {
+  async findUserById(id: string): Promise<User | null> {
     return await this.prisma.user.findUnique({
       where: { id },
     });
@@ -48,7 +48,7 @@ export class UserService {
     return newUser; // نعيد المستخدم الجديد
   }
 
-  async UpdateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async UpdateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     // نتحقق من وجود المستخدم
     const existingUser = await this.prisma.user.findUnique({
       where: { id }, // نبحث عن مستخدم بنفس المعرف

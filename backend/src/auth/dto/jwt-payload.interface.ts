@@ -3,7 +3,7 @@
 // src/auth/dto/jwt-payload.interface.ts
 
 export interface JwtPayloadInterface {
-  sub: number;
+  sub: string;
   email: string;
   // يمكنك إضافة حقول أخرى مثل الدور (role) لو أردت دعم صلاحيات أكثر تعقيدًا
 }
