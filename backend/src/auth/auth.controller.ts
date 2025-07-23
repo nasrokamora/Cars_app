@@ -19,14 +19,14 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // مسار التسجيل (Sign Up)
-  @Post('signup')
+  @Post('/signup')
   async signup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.signup(createUserDto);
   }
 
   // مسار تسجيل الدخول (Login) باستخدام الحارس المحلي (LocalAuthGuard)
   @UseGuards(LocalAuthGuard) // هذا الحارس يحقّق البريد وكلمة المرور أولًا
-  @Post('login')
+  @Post('/login')
   login(@Req() req: AuthenticatedUserRequest) {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
     return this.authService.login(req.user);
