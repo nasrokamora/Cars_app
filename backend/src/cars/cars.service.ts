@@ -14,7 +14,7 @@ import { plainToInstance } from 'class-transformer';
 export class CarsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createCar(dto: CreateCarDto, ownerId: number): Promise<Car> {
+  async createCar(dto: CreateCarDto, ownerId: string): Promise<Car> {
     const Car = await this.prisma.car.create({
       data: {
         title: dto.title,
@@ -89,7 +89,7 @@ export class CarsService {
   }
 
   //تعديل سيارة
-  async updateCar(id: string, updateCarDto: UpdateCarDto, ownerId: number) {
+  async updateCar(id: string, updateCarDto: UpdateCarDto, ownerId: string) {
     const car = await this.prisma.car.findUnique({
       where: { id },
       select: { ownerid: true },
@@ -121,7 +121,7 @@ export class CarsService {
   }
 
   //حذف سيارة
-  async deleteCar(id: string, ownerId: number) {
+  async deleteCar(id: string, ownerId: string): Promise<Car> {
     const deletedCar = await this.prisma.car.findUnique({
       where: { id },
       select: { ownerid: true },

@@ -16,7 +16,7 @@ export class MessagesService {
 
   private MapToResponseDto(
     message: Message & {
-      sender: { id: number; username: string };
+      sender: { id: string; username: string };
       car: { id: string; title: string; price: number };
     },
   ): MessageResponseDto {
@@ -38,7 +38,7 @@ export class MessagesService {
 
   async createMessage(
     createMessageDto: CreateMessageDto,
-    senderId: number,
+    senderId: string,
   ): Promise<Message> {
     return await this.prisma.message.create({
       data: {
@@ -50,7 +50,7 @@ export class MessagesService {
   }
 
   async findAllMessages(
-    senderId: number,
+    senderId: string,
     page = 1,
     limit = 20,
   ): Promise<{
@@ -103,7 +103,7 @@ export class MessagesService {
   async updateMessage(
     id: string,
     updateMessageDto: UpdateMessageDto,
-    senderId: number,
+    senderId: string,
   ): Promise<MessageResponseDto | null> {
     const message = await this.prisma.message.findUnique({
       where: { id },
@@ -136,7 +136,7 @@ export class MessagesService {
 
   // Delete a message
   // This method allows the sender to delete their own message.
-  async deleteMessage(id: string, senderId: number): Promise<boolean> {
+  async deleteMessage(id: string, senderId: string): Promise<boolean> {
     const message = await this.prisma.message.findUnique({
       where: { id },
     });

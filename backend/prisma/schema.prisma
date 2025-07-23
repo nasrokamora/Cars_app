@@ -24,6 +24,7 @@ model User {
   messages  Message[] @relation("UserMessages")
   createdAt DateTime  @default(now()) // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
   updatedAt DateTime  @updatedAt // تاريخ التحديث (يتغيّر تلقائيًا عند التعديل)
+  images    Image[]
 }
 
 enum Role {
@@ -53,10 +54,14 @@ model Brand {
 }
 
 model Image {
-  id    String @id @default(uuid())
-  url   String
-  car   Car    @relation("CarImages", fields: [carId], references: [id])
-  carId String
+  id         String   @id @default(uuid())
+  url        String
+  car        Car      @relation("CarImages", fields: [carId], references: [id])
+  carId      String
+  uploadedBy User     @relation(fields: [userId], references: [id])
+  userId     String
+  createdAt  DateTime @default(now())
+  updetedAt  DateTime @updatedAt
 }
 
 model Category {

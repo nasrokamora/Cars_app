@@ -3,7 +3,7 @@ export class MessageResponseDto {
   content: string;
   createdAt: Date;
   sender: {
-    id: number;
+    id: string;
     username: string;
   };
   car: {

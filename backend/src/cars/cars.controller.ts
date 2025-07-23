@@ -23,7 +23,7 @@ export class CarsController {
   constructor(private readonly carsService: CarsService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('/create-car')
   async create(
     @Body() createCarDto: CreateCarDto,
     @Req() req: AuthenticatedRequest,
