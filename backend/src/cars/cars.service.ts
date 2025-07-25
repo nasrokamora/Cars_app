@@ -22,9 +22,15 @@ export class CarsService {
         price: dto.price,
         brand: { connect: { id: dto.brandId } },
         category: {
-          connect: dto.categoryId.map((id) => ({ id })),
+          connect: { id: dto.categoryId }, // Assuming categoryId is a single UUID
         },
         owner: { connect: { id: ownerId } },
+        images: {
+          create: dto.image?.map((image) => ({
+            url: image.url,
+            uploadedBy: { connect: { id: ownerId } },
+          })),
+        },
       },
     });
     if (!Car) {
@@ -100,6 +106,7 @@ export class CarsService {
     if (car.ownerid !== ownerId) {
       throw new ForbiddenException('You are not authorized to update this car');
     }
+
     return await this.prisma.car.update({
       where: { id },
       data: {
@@ -110,7 +117,7 @@ export class CarsService {
           ? { connect: { id: updateCarDto.brandId } }
           : undefined,
         category: updateCarDto.categoryId
-          ? { set: updateCarDto.categoryId.map((id) => ({ id })) }
+          ? { connect: { id: updateCarDto.categoryId } }
           : undefined,
       },
       include: {

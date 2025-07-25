@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   ValidateNested,
@@ -23,10 +24,10 @@ export class CreateCarDto {
   @IsUUID()
   brandId: string;
 
-  @IsArray()
-  @IsUUID('all', { each: true })
-  categoryId: string[]; // many-to-many
+  @IsUUID()
+  categoryId: string; // one-to-many
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ImageInput)

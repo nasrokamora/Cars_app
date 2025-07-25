@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 
@@ -25,7 +25,6 @@ export class MessagesService {
       content: message.content,
       createdAt: message.createdAt,
       sender: {
-        id: message.sender.id,
         username: message.sender.username,
       },
       car: {
@@ -39,14 +38,20 @@ export class MessagesService {
   async createMessage(
     createMessageDto: CreateMessageDto,
     senderId: string,
-  ): Promise<Message> {
-    return await this.prisma.message.create({
+  ): Promise<MessageResponseDto> {
+    const message = await this.prisma.message.create({
       data: {
         content: createMessageDto.content,
         sender: { connect: { id: senderId } },
         car: { connect: { id: createMessageDto.carId } },
       },
+      include: {
+        sender: { select: { id: true, username: true } },
+        car: { select: { id: true, title: true, price: true } },
+      },
     });
+
+    return this.MapToResponseDto(message);
   }
 
   async findAllMessages(
@@ -74,7 +79,7 @@ export class MessagesService {
       }),
     ]);
     return {
-      data: messages,
+      data: messages.map((message) => this.MapToResponseDto(message)),
       meta: {
         page,
         limit,
@@ -108,7 +113,7 @@ export class MessagesService {
     const message = await this.prisma.message.findUnique({
       where: { id },
       include: {
-        sender: { select: { id: true, username: true } },
+        sender: { select: { username: true } },
         car: { select: { id: true, title: true, price: true } },
       },
     });
@@ -116,7 +121,7 @@ export class MessagesService {
       throw new NotFoundException(`Message with id ${id} not found`);
     }
     if (message.senderId !== senderId) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         `You are not authorized to update this message`,
       );
     }

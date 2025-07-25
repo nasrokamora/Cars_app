@@ -33,17 +33,18 @@ enum Role {
 }
 
 model Car {
-  id          String     @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   discription String
   price       Float
-  brand       Brand      @relation(fields: [brandId], references: [id])
+  brand       Brand     @relation(fields: [brandId], references: [id])
   brandId     String
-  category    Category[]
-  images      Image[]    @relation("CarImages")
-  owner       User       @relation(fields: [ownerid], references: [id])
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  images      Image[]   @relation("CarImages")
+  owner       User      @relation(fields: [ownerid], references: [id])
   ownerid     String
-  createdAt   DateTime   @default(now())
+  createdAt   DateTime  @default(now())
   Message     Message[]
 }
 
@@ -61,7 +62,7 @@ model Image {
   uploadedBy User     @relation(fields: [userId], references: [id])
   userId     String
   createdAt  DateTime @default(now())
-  updetedAt  DateTime @updatedAt
+  updatedAt  DateTime @updatedAt
 }
 
 model Category {

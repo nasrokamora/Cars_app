@@ -1,0 +1,45 @@
+{
+  "data": [
+    {
+      "id": "4e768a9b-109c-4d9d-8196-4a4b87db1f90",
+      "title": "Peugeot",
+      "price": 6500,
+      "brand": "Peugeot",
+      "category": [],
+      "images": [],
+      "createdAt": "2025-07-25T18:42:31.027Z",
+      "owner": { "username": "kamora" }
+    },
+    {
+      "id": "425e1a32-cc08-4c78-9c89-6ab80ff2f4ed",
+      "title": "BYD",
+      "price": 1500,
+      "brand": "BYD",
+      "category": [],
+      "images": [],
+      "createdAt": "2025-07-25T18:41:23.930Z",
+      "owner": { "username": "kamora" }
+    },
+    {
+      "id": "39979c82-00fe-43bf-99c3-55de2ec8600c",
+      "title": "toyota",
+      "price": 1000,
+      "brand": "Toyota",
+      "category": [],
+      "images": [],
+      "createdAt": "2025-07-25T18:38:51.528Z",
+      "owner": { "username": "kamora" }
+    },
+    {
+      "id": "592ad32e-f7eb-4bb6-af0d-8ff425617638",
+      "title": "bmw car",
+      "price": 1000,
+      "brand": "Toyota",
+      "category": [],
+      "images": [],
+      "createdAt": "2025-07-25T18:35:33.250Z",
+      "owner": { "username": "kamora" }
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 4 }
+}

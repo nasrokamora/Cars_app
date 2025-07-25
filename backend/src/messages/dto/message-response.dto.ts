@@ -3,7 +3,6 @@ export class MessageResponseDto {
   content: string;
   createdAt: Date;
   sender: {
-    id: string;
     username: string;
   };
   car: {

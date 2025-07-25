@@ -18,7 +18,7 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/types/authenticatedReq.type';
 
-@Controller('api/messages')
+@Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
