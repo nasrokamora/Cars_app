@@ -42,15 +42,12 @@ export class ImagesService {
   ) {
     const existingImage = await this.prisma.image.findUnique({
       where: { id },
-      select: { uploadedBy: true, car: true },
+      select: { uploadedBy: true },
     });
     if (!existingImage) {
       throw new NotFoundException('Image not found');
     }
-    if (
-      existingImage.uploadedBy.id !== userId ||
-      existingImage.car.ownerid !== userId
-    ) {
+    if (existingImage.uploadedBy.id !== userId) {
       throw new ForbiddenException(
         'You are not authorized to update this image',
       );
@@ -61,11 +58,32 @@ export class ImagesService {
         data: {
           url: updateImageDto.url,
         },
+        include: {
+          car: true,
+        },
       });
     } catch (error) {
       throw new ForbiddenException(
         error instanceof Error ? error.message : 'Image update failed',
       );
     }
+  }
+
+  async deleteImage(id: string, userId: string): Promise<void> {
+    const existingImage = await this.prisma.image.findUnique({
+      where: { id },
+      select: { uploadedBy: true },
+    });
+    if (!existingImage) {
+      throw new NotFoundException('Image not found');
+    }
+    if (existingImage.uploadedBy.id !== userId) {
+      throw new ForbiddenException(
+        'You are not authorized to delete this image',
+      );
+    }
+    await this.prisma.image.delete({
+      where: { id },
+    });
   }
 }

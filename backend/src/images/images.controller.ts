@@ -21,7 +21,7 @@ export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @UseGuards(JwtAuthGuard) // Ensure the user is authenticated
-  @Post()
+  @Post('/create-image')
   create(
     @Body() createImageDto: CreateImageDto,
     @Req() req: AuthenticatedRequest,
