@@ -7,10 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
-  BadRequestException,
   Req,
   UsePipes,
   ValidationPipe,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -30,7 +30,7 @@ export class CarsController {
   ) {
     const ownerId = req.user?.userId;
     if (!ownerId) {
-      throw new BadRequestException('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
     return await this.carsService.createCar(createCarDto, ownerId);
   }
@@ -58,7 +58,7 @@ export class CarsController {
   ) {
     const ownerId = req.user?.userId;
     if (!ownerId) {
-      throw new BadRequestException('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
 
     return await this.carsService.updateCar(id, updateCarDto, ownerId);
@@ -71,7 +71,7 @@ export class CarsController {
   async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     const ownerId = req.user?.userId;
     if (!ownerId) {
-      throw new BadRequestException('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
     return await this.carsService.deleteCar(id, ownerId);
   }

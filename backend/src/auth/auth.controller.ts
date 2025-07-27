@@ -13,6 +13,8 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 
 import { AuthenticatedUserRequest } from './types/authenticatedReq.type';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { User } from 'src/users/decorator/user.decorator';
+import { AuthUser } from 'src/users/types/user.types';
 
 @Controller('auth')
 export class AuthController {
@@ -34,11 +36,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT
   @Get('/profile')
-  getProfile(@Request() req: AuthenticatedUserRequest) {
-    return {
-      message: 'User profile retrieved successfully',
-      user: req.user,
-      // يمكنك إضافة المزيد من المعلومات هنا إذا لزم الأمر
-    };
+  getProfile(@User() user: AuthUser): AuthUser {
+    return user;
   }
 }
