@@ -14,6 +14,7 @@ export class ImagesService {
   async createImage(
     createImageDto: CreateImageDto,
     userId: string,
+    file: Express.Multer.File,
   ): Promise<Image> {
     // Validate the carId exists in the database
     const car = await this.prisma.car.findUnique({
@@ -25,10 +26,10 @@ export class ImagesService {
         'You are not allowed to upload images for this car.',
       );
     }
-
+    const imageUrl = file.path; // Assuming the file is saved and its path is available
     return await this.prisma.image.create({
       data: {
-        url: createImageDto.url,
+        url: imageUrl,
         uploadedBy: { connect: { id: userId } },
         car: { connect: { id: createImageDto.carId } },
       },
