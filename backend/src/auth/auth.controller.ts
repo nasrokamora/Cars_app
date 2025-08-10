@@ -4,8 +4,8 @@ import {
   Get,
   Post,
   Req,
-  Request,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -15,6 +15,7 @@ import { AuthenticatedUserRequest } from './types/authenticatedReq.type';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from 'src/users/decorator/user.decorator';
 import { AuthUser } from 'src/users/types/user.types';
+import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +34,7 @@ export class AuthController {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
     return this.authService.login(req.user);
   }
-
+  @UseInterceptors(RemovePasswordInterceptor)
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT
   @Get('/profile')
   getProfile(@User() user: AuthUser): AuthUser {

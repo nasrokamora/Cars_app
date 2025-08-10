@@ -43,12 +43,12 @@ export class ImagesService {
   ) {
     const existingImage = await this.prisma.image.findUnique({
       where: { id },
-      select: { uploadedBy: true },
+      select: { userId: true },
     });
     if (!existingImage) {
       throw new NotFoundException('Image not found');
     }
-    if (existingImage.uploadedBy.id !== userId) {
+    if (existingImage.userId !== userId) {
       throw new ForbiddenException(
         'You are not authorized to update this image',
       );

@@ -1,6 +1,5 @@
 import {
   Controller,
-  // Get,
   Post,
   Body,
   UseGuards,
@@ -8,15 +7,16 @@ import {
   UnauthorizedException,
   UseInterceptors,
   UploadedFile,
-  // Patch,
-  // Param,
-  // Delete,
+  Patch,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/types/authenticatedReq.type';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateImageDto } from './dto/update-image.dto';
 // import { UpdateImageDto } from './dto/update-image.dto';
 
 @Controller('images')
@@ -38,23 +38,31 @@ export class ImagesController {
     return this.imagesService.createImage(createImageDto, userId, file);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.imagesService.findAll();
-  // }
-
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.imagesService.findOne(+id);
   // }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
-  //   return this.imagesService.update(+id, updateImageDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateImageDto: UpdateImageDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return await this.imagesService.UpdateImage(id, updateImageDto, userId);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.imagesService.remove(+id);
-  // }
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return await this.imagesService.deleteImage(id, userId);
+  }
 }
