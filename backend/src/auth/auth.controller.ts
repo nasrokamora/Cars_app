@@ -34,6 +34,7 @@ export class AuthController {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
     return this.authService.login(req.user);
   }
+
   @UseInterceptors(RemovePasswordInterceptor)
   @UseGuards(JwtAuthGuard) // هذا الحارس يستخدم للتحقق من صلاحية المستخدمين باستخدام JWT
   @Get('/profile')

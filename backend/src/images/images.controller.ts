@@ -38,11 +38,6 @@ export class ImagesController {
     return this.imagesService.createImage(createImageDto, userId, file);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.imagesService.findOne(+id);
-  // }
-
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
