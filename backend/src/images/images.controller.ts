@@ -40,16 +40,18 @@ export class ImagesController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('file'))
   async update(
     @Param('id') id: string,
     @Body() updateImageDto: UpdateImageDto,
+    @UploadedFile() file: Express.Multer.File,
     @Req() req: AuthenticatedRequest,
   ) {
     const userId = req.user?.userId;
     if (!userId) {
       throw new UnauthorizedException('User not authenticated');
     }
-    return await this.imagesService.UpdateImage(id, updateImageDto, userId);
+    return await this.imagesService.UpdateImage(id, userId, file);
   }
 
   @Delete(':id')

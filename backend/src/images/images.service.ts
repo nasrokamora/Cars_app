@@ -6,7 +6,7 @@ import {
 import { CreateImageDto } from './dto/create-image.dto';
 import { Image } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateImageDto } from './dto/update-image.dto';
+// import { UpdateImageDto } from './dto/update-image.dto';
 
 @Injectable()
 export class ImagesService {
@@ -38,9 +38,9 @@ export class ImagesService {
 
   async UpdateImage(
     id: string,
-    updateImageDto: UpdateImageDto,
     userId: string,
-  ) {
+    file: Express.Multer.File,
+  ): Promise<Image> {
     const existingImage = await this.prisma.image.findUnique({
       where: { id },
       select: { userId: true },
@@ -53,11 +53,12 @@ export class ImagesService {
         'You are not authorized to update this image',
       );
     }
+    const imageUrl = file.path; // Assuming the file is saved and its path is available
     try {
       return await this.prisma.image.update({
         where: { id },
         data: {
-          url: updateImageDto.url,
+          url: imageUrl,
         },
         include: {
           car: true,
