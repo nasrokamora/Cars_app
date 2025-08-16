@@ -10,13 +10,15 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
-import { CreateImageDto } from './dto/create-image.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/types/authenticatedReq.type';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateImageDto } from './dto/update-image.dto';
+import multer from 'multer';
+import { extname } from 'path';
 // import { UpdateImageDto } from './dto/update-image.dto';
 
 @Controller('images')
@@ -24,10 +26,23 @@ export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @UseGuards(JwtAuthGuard) // Ensure the user is authenticated
-  @UseInterceptors(FileInterceptor('file')) // Use FileInterceptor to handle file uploads
-  @Post('/upload')
-  uploadFile(
-    @Body() createImageDto: CreateImageDto,
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: multer.diskStorage({
+        destination: './upload',
+        filename(req, file, cb) {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}-${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  ) // Use FileInterceptor to handle file uploads
+  @Post('/upload/:carId')
+  createImage(
+    @Param('carId') carId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: AuthenticatedRequest,
   ) {
@@ -35,7 +50,7 @@ export class ImagesController {
     if (!userId) {
       throw new UnauthorizedException('User not authenticated');
     }
-    return this.imagesService.createImage(createImageDto, userId, file);
+    return this.imagesService.createImage(userId, file, carId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -55,11 +70,13 @@ export class ImagesController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+  @UseGuards(JwtAuthGuard)
+  async remove(
+    @Param('id', ParseUUIDPipe) imageId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
     const userId = req.user?.userId;
-    if (!userId) {
-      throw new UnauthorizedException('User not authenticated');
-    }
-    return await this.imagesService.deleteImage(id, userId);
+    await this.imagesService.deleteImage(userId, imageId);
+    return { message: 'Image deleted successfully' };
   }
 }

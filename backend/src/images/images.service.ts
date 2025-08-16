@@ -3,8 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateImageDto } from './dto/create-image.dto';
+// import { CreateImageDto } from './dto/create-image.dto';
 import { Image } from '@prisma/client';
+import { unlinkSync } from 'fs';
+import { join } from 'path';
 import { PrismaService } from 'src/prisma/prisma.service';
 // import { UpdateImageDto } from './dto/update-image.dto';
 
@@ -12,13 +14,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ImagesService {
   constructor(private readonly prisma: PrismaService) {}
   async createImage(
-    createImageDto: CreateImageDto,
     userId: string,
     file: Express.Multer.File,
+    carId: string,
   ): Promise<Image> {
     // Validate the carId exists in the database
-    const car = await this.prisma.car.findUnique({
-      where: { id: createImageDto.carId },
+    const car = await this.prisma.car.findFirst({
+      where: { id: carId, ownerid: userId },
     });
 
     if (!car || car.ownerid !== userId) {
@@ -26,14 +28,15 @@ export class ImagesService {
         'You are not allowed to upload images for this car.',
       );
     }
-    const imageUrl = file.path; // Assuming the file is saved and its path is available
-    return await this.prisma.image.create({
+    const newImage = await this.prisma.image.create({
       data: {
-        url: imageUrl,
+        url: file.path, // Assuming the file is saved and its path is available
         uploadedBy: { connect: { id: userId } },
-        car: { connect: { id: createImageDto.carId } },
+        car: { connect: { id: carId } },
       },
     });
+
+    return newImage;
   }
 
   async UpdateImage(
@@ -71,21 +74,22 @@ export class ImagesService {
     }
   }
 
-  async deleteImage(id: string, userId: string): Promise<void> {
-    const existingImage = await this.prisma.image.findUnique({
-      where: { id },
-      select: { uploadedBy: true },
+  async deleteImage(userId: string, imageId: string) {
+    const image = await this.prisma.image.findFirst({
+      where: { id: imageId, userId: userId },
     });
-    if (!existingImage) {
+    if (!image) {
       throw new NotFoundException('Image not found');
     }
-    if (existingImage.uploadedBy.id !== userId) {
-      throw new ForbiddenException(
-        'You are not authorized to delete this image',
+    try {
+      unlinkSync(join(process.cwd(), image.url));
+    } catch (error) {
+      console.error(
+        `error deleting file ${image.url}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
     await this.prisma.image.delete({
-      where: { id },
+      where: { id: imageId },
     });
   }
 }
