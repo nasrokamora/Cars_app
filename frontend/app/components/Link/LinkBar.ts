@@ -14,4 +14,9 @@ export const LinkBar = [
     title: "Used Cars",
     url: "/used-cars",
   },
+  {
+    id: 4,
+    title: "Research",
+    url: "/Research"
+  }
 ];
