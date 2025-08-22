@@ -6,12 +6,12 @@ export const LinkBar = [
   },
   {
     id: 2,
-    title: "About",
-    url: "/about",
+    title: "New Cars",
+    url: "/new-cars",
   },
   {
     id: 3,
-    title: "Contact",
-    url: "/contact",
+    title: "Used Cars",
+    url: "/used-cars",
   },
 ];
