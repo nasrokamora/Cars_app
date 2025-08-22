@@ -3,6 +3,9 @@
 @plugin "daisyui";
 @custom-variant dark (&:is(.dark *));
 
+*{
+  scroll-behavior: smooth;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -6,8 +6,9 @@ import { CommandMenu } from "../Buttons/SearchButton";
 
 export default function NavBar() {
     return (
-        <div className="navbar bg-neutral text-neutral-content">
-            <button className="btn btn-ghost text-xl">daisyUI</button>
+        <div className="navbar bg-neutral text-neutral-content justify-between">
+            <Link href={"/"} className="m-1 text-xl">CarHub</Link>
+
             <ul className=" flex justify-center items-center">
                 {LinkBar.map((link) => (
                     <li key={link.id} className="mx-2">
