@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LinkBar } from "../Link/LinkBar";
 // import { Input } from "@/components/ui/input"
 import { CommandMenu } from "../Buttons/SearchButton";
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 
 export default function NavBar() {
@@ -9,10 +10,14 @@ export default function NavBar() {
         <div className="navbar bg-neutral text-neutral-content justify-between">
 
             {/* icon link  */}
-            <Link href={"/"} className="m-1 text-xl">CarHub</Link>
+            <Link href={"/"} className="m-1 text-2xl">
+                <AuroraText colors={["#FF0000", "#7928CA", "#0070F3", "#38fdf8"]}>
+                    Cars Hub
+                </AuroraText>
+            </Link>
 
             {/*  list of Link routes  */}
-            <ul className=" flex justify-center items-center">
+            <ul className="hidden  justify-center items-center  sm:flex">
                 {LinkBar.map((link) => (
                     <li key={link.id} className="mx-2">
                         <Link href={link.url} className=" hover:underline hover:decoration-blue-300 duration-300">{link.title.toUpperCase()}</Link>

@@ -2,13 +2,11 @@
 
 
 export default function Home() {
-  return (
-    <div className="">
-      
-      <main>
+  return (      
+      <main className=" min-h-screen">
         
       </main>
 
-    </div>
+
   );
 }
