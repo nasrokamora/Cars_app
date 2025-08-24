@@ -109,23 +109,25 @@ export function NavigationMenuDemo() {
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>List</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Cars</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[300px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
-                    <div className="font-medium">Components</div>
+                  <Link href="/new-cars">
+                    <div className="font-medium">New Car</div>
                     <div className="text-muted-foreground">
-                      Browse all components in the library.
+                      Find the latest car models.
                     </div>
                   </Link>
+
+
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
-                    <div className="font-medium">Documentation</div>
+                  <Link href="used-cars">
+                    <div className="font-medium">Used Cars</div>
                     <div className="text-muted-foreground">
-                      Learn how to use the library.
+                      Find used cars for sale.
                     </div>
                   </Link>
                 </NavigationMenuLink>
