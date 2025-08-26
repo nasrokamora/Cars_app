@@ -27,15 +27,15 @@ export const LinkBar = [
   {
     id: 6,
     title: "Contact",
-    url: "/about/contact"
+    url: "/contact"
   },{
     id: 7,
-    title: "Terms and Conditions",
-    url: "/about/terms-conditions"
+    title: "Terms & Conditions",
+    url: "/terms-conditions"
   },
   {
     id: 8,
     title: "Privacy Policy",
-    url: "/about/privacy-policy"
+    url: "/privacy-policy"
   }
 ];
