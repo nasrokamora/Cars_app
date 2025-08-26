@@ -124,7 +124,7 @@ export function NavigationMenuDemo() {
 
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
-                  <Link href="used-cars">
+                  <Link href="/used-cars">
                     <div className="font-medium">Used Cars</div>
                     <div className="text-muted-foreground">
                       Find used cars for sale.
@@ -132,7 +132,7 @@ export function NavigationMenuDemo() {
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="car-rentals">
                     <div className="font-medium">Blog</div>
                     <div className="text-muted-foreground">
                       Read our latest blog posts.
