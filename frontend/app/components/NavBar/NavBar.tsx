@@ -33,11 +33,11 @@ export default function NavBar() {
             <div>
                 <CommandMenu />
             </div>
-            <div className="">
+            {/* <div className="">
                 <Link href={"/login"} className="btn  rounded-btn">
                     Login
                 </Link>
-            </div>
+            </div> */}
         </nav>
     )
 }
