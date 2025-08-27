@@ -12,16 +12,23 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Link from "next/link";
 export default function LoginPage() {
     return (
-        <Card className="w-full max-w-sm">
+        <div className=" flex justify-center items-center h-screen">
+
+        <Card className="w-full max-w-sm text-3xl bg-blue-500 glass  ">
             <CardHeader>
                 <CardTitle>Login to your account</CardTitle>
-                <CardDescription>
+                <CardDescription className="text-white">
                     Enter your email below to login to your account
                 </CardDescription>
                 <CardAction>
-                    <Button variant="link">Sign Up</Button>
+                    <Button variant="link" className="text-xl">
+                        <Link href={'/auth/register'} >
+                        Sign Up
+                        </Link>
+                        </Button>
                 </CardAction>
             </CardHeader>
             <CardContent>
@@ -34,6 +41,7 @@ export default function LoginPage() {
                                 type="email"
                                 placeholder="m@example.com"
                                 required
+                                className="placeholder:text-white"
                             />
                         </div>
                         <div className="grid gap-2">
@@ -60,6 +68,7 @@ export default function LoginPage() {
                 </Button>
             </CardFooter>
         </Card>
+        </div>
         // <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
         //     {/* <Image src={imageLogin} fill alt="Login" className="object-contain" /> */}
         //     <div className="w-full max-w-md  dark:bg-gray-800 rounded-xl shadow p-6">
