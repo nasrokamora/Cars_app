@@ -12,7 +12,7 @@ export const LinkBar = [
   {
     id: 3,
     title: "Used Cars",
-    url: "/cars/used-cars",
+    url: "/used-cars",
   },
   {
     id: 4,
