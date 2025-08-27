@@ -27,10 +27,22 @@ const componentsLink: { title: string; href: string; description: string }[] = [
   },
 ]
 
+const componentsLinkAbout: { title: string; href: string; description: string }[] = [
+  {
+    title: "About",
+    href: '/about',
+    description: "about us"
+  },
+  {
+    title: "Contact",
+    href: '/contact',
+    description: "contact us"
+  },
+]
+
 export function NavigationsMenu() {
   return (
     <div className=" sm:flex hidden">
-
       <NavigationMenu viewport={false} className="bg-transparent sm:flex">
         <NavigationMenuList>
           <NavigationMenuItem>
@@ -55,22 +67,17 @@ export function NavigationsMenu() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Simple</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid w-[200px] gap-4">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <Link href="#">Components</Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link href="#">Documentation</Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link href="#">Blocks</Link>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
-            </NavigationMenuContent>
+            <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+              <div className="flex justify-center items-center ">
+              <Link href="/Research" className=" flex justify-center items-center ">
+              Research
+                <div className="text-white pl-2">
+                <kbd className="kbd kbd-sm mr-1 ">⌘</kbd>
+                <kbd className="kbd kbd-sm ">K</kbd>
+                </div>
+                </Link>
+              </div>
+            </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuTrigger>With Icon</NavigationMenuTrigger>
@@ -104,26 +111,6 @@ export function NavigationsMenu() {
     </div>
   )
 }
-
-// function ListItem({
-//   title,
-//   children,
-//   href,
-//   ...props
-// }: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
-//   return (
-//     <li {...props}>
-//       <NavigationMenuLink asChild>
-//         <Link href={href}>
-//           <div className="text-sm leading-none font-medium">{title}</div>
-//           <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
-//             {children}
-//           </p>
-//         </Link>
-//       </NavigationMenuLink>
-//     </li>
-//   )
-// }
 function ListItemLink({
   title,
   children,
