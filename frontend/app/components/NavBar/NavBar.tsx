@@ -1,16 +1,20 @@
 import Link from "next/link";
 import { CommandMenu } from "../Buttons/SearchButton";
 import { AuroraText } from "@/components/magicui/aurora-text";
-import { NavigationsMenu } from "./NavigationMenu";
+// import {NavigationsMenu } from "./NavigationMenu";
 import { DropdownMenuLinks } from "./DropDownMenu/DropDownMenu";
 import LoginSignUpButton from "../Buttons/LoginSignUpButton";
+import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggler";
+// import NavigationLargeLayout from "./NavigationLargeLayout";
+import NavigationsLargeLayout from "./NavigationLargeLayout";
+import NavigationsMenu from "./NavigationMenu";
 
 // import NavigationMenuExample from "./NavigationMenu";
 
 
 export default function NavBar() {
     return (
-        <nav className="navbar bg-neutral text-black gap-3 justify-between items-center ">
+        <nav className="navbar  gap-3 justify-between items-center border-b border-gray-400 ">
             <div className=" ">
 
                 {/* icon link  */}
@@ -24,21 +28,34 @@ export default function NavBar() {
                 </div>
 
             </div>
-            <div className="">
+            {/* navigation menu md => all */}
+            <div>
                 <NavigationsMenu />
             </div>
 
-            <div className="">
+            {/* navigation menu sm => none */}
+
+            {/* <div>
+                <NavigationLargeLayout />
+            </div> */}
+            <div>
+                <NavigationsLargeLayout />
+            </div>
+
+            {/* login and sign up */}
+            <div>
                 <LoginSignUpButton />
             </div>
+            
+            {/* dark mode toggle */}
+            <div>
+                <AnimatedThemeToggler className="bg-none" />
+            </div>
+
+            {/* commend CTRL + K to open Commend research */}
             <div>
                 <CommandMenu />
             </div>
-            {/* <div className="">
-                <Link href={"/login"} className="btn  rounded-btn">
-                    Login
-                </Link>
-            </div> */}
         </nav>
     )
 }

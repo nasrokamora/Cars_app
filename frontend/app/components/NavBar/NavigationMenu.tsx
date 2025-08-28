@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { CircleCheckIcon, CircleHelpIcon, CircleIcon } from "lucide-react"
+
 
 import {
   NavigationMenu,
@@ -13,50 +13,15 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import bmwPng from '@/public/all_image_cars/bmwPng.png'
-import symbole from '@/public/all_image_cars/symboleCar.png'
-import Image from "next/image"
-const componentsLink: { title: string; href: string; description: string, image?: React.ReactNode }[] = [
-  {
-    title: "New Cars",
-    href: '/new-cars',
-    description: "Find the latest cars on the market",
-    image:<Image src={bmwPng} alt="bmw" width={48} height={48} /> 
-  },
-  {
-    title: "Used Cars",
-    href: '/used-cars',
-    description: "Find the latest cars on the market",
-    image:<Image src={symbole} alt="bmw" width={48} height={48} />
-  },
-]
+import { componentsLink, componentsVihicles } from "../Link/ComponentsAllLink"
 
 
-const componentsVihicles: { title: string; href: string; description: string, image?: React.ReactNode }[] = [
-  {
-    title: "Trucks",
-    href: '/trucks',
-    description: "Find the latest trucks on the market",
-    image:<Image src={symbole} alt="bmw" width={48} height={48} />
-  },
-  {
-    title: "Motorcycles",
-    href: '/motorcycles',
-    description: "Find the latest motorcycles on the market",
-    image:<Image src={symbole} alt="bmw" width={48} height={48} />
-  },
-  {
-    title: "Buses",
-    href: '/buses',
-    description: "Find the latest buses on the market",
-    image:<Image src={symbole} alt="bmw" width={48} height={48} />
-  },
 
-]
 
-export function NavigationsMenu() {
+
+export default function NavigationsMenu() {
   return (
-    <div className=" sm:flex hidden">
+    <div className=" md:flex  hidden">
       <NavigationMenu viewport={false} className="bg-transparent sm:flex">
         <NavigationMenuList>
           <NavigationMenuItem>
@@ -77,15 +42,15 @@ export function NavigationsMenu() {
                   >
                     <div className=" flex justify-between items-center">
 
-                    {link.description}
-                    {link.image}
+                      {link.description}
+                      {link.image}
                     </div>
                   </ListItemLink>
                 ))}
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-                {/* trucks */}
+          {/* trucks */}
           <NavigationMenuItem>
             <NavigationMenuTrigger>Vehicles</NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -99,8 +64,8 @@ export function NavigationsMenu() {
                   >
                     <div className=" flex justify-between items-center">
 
-                    {link.description}
-                    {link.image}
+                      {link.description}
+                      {link.image}
                     </div>
                   </ListItemLink>
                 ))}
@@ -108,15 +73,15 @@ export function NavigationsMenu() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           {/* Search */}
-                    <NavigationMenuItem>
+          <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
               <div className="flex justify-center items-center ">
-              <Link href="/Research" className=" flex justify-center items-center ">
-              Research
-                <div className="text-white pl-2">
-                <kbd className="kbd kbd-sm mr-1 ">⌘</kbd>
-                <kbd className="kbd kbd-sm ">K</kbd>
-                </div>
+                <Link href="/Research" className=" flex justify-center items-center ">
+                  Research
+                  <div className="text-white pl-2">
+                    <kbd className="kbd kbd-sm mr-1 ">⌘</kbd>
+                    <kbd className="kbd kbd-sm ">K</kbd>
+                  </div>
                 </Link>
               </div>
             </NavigationMenuLink>
@@ -126,7 +91,7 @@ export function NavigationsMenu() {
     </div>
   )
 }
-function ListItemLink({
+ function ListItemLink({
   title,
   children,
   href,

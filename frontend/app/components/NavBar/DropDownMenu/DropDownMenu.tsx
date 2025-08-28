@@ -17,7 +17,7 @@ import { LinkBar } from "../../Link/LinkBar";
 // import LogoImage from "@/public/CarHub_MarketPlace.png"
 export function DropdownMenuLinks() {
     return (
-        <div className="sm:hidden">
+        <div className="sm:hidden  ">
             <Sheet >
                 <SheetTrigger asChild>
                     <Button
@@ -25,7 +25,7 @@ export function DropdownMenuLinks() {
                         size="icon"
                         className="rounded-lg bg-gray-100 dark:bg-gray-800 scroll-y-auto"
                     >
-                        <Menu className="h-6 w-6" />
+                        <Menu className="h-6 w-6 dark:text-white" />
                     </Button>
                 </SheetTrigger>
 
