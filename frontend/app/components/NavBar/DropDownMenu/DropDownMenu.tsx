@@ -13,10 +13,10 @@ import { Car, User } from "lucide-react"
 // import LogoImage from "@/public/CarHub_MarketPlace.png"
 export function DropdownMenuLinks() {
     return (
-        <div className="sm:hidden mr-3">
-            <Popover>
+        <div className="sm:hidden  mr-3">
+            <Popover >
 
-                <PopoverTrigger asChild className=" mr-3">
+                <PopoverTrigger asChild >
                     <Button variant="outline" className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         <span>Account</span>
