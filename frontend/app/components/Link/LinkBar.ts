@@ -37,5 +37,20 @@ export const LinkBar = [
     id: 8,
     title: "Privacy Policy",
     url: "/privacy-policy"
+  },
+  {
+    id: 9,
+    title: "Motorcycles",
+    url: "/motorcycles"
+  },
+  {
+    id: 10,
+    title: "Trucks",
+    url: "/trucks"
+  },
+  {
+    id: 11,
+    title: "Buses",
+    url: "/buses"
   }
 ];

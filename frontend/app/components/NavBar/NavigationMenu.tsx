@@ -13,31 +13,45 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-
-const componentsLink: { title: string; href: string; description: string }[] = [
+import bmwPng from '@/public/all_image_cars/bmwPng.png'
+import symbole from '@/public/all_image_cars/symboleCar.png'
+import Image from "next/image"
+const componentsLink: { title: string; href: string; description: string, image?: React.ReactNode }[] = [
   {
     title: "New Cars",
     href: '/new-cars',
-    description: "Find the latest cars on the market"
+    description: "Find the latest cars on the market",
+    image:<Image src={bmwPng} alt="bmw" width={48} height={48} /> 
   },
   {
     title: "Used Cars",
     href: '/used-cars',
-    description: "Find the latest cars on the market"
+    description: "Find the latest cars on the market",
+    image:<Image src={symbole} alt="bmw" width={48} height={48} />
   },
 ]
 
-const componentsLinkAbout: { title: string; href: string; description: string }[] = [
+
+const componentsVihicles: { title: string; href: string; description: string, image?: React.ReactNode }[] = [
   {
-    title: "About",
-    href: '/about',
-    description: "about us"
+    title: "Trucks",
+    href: '/trucks',
+    description: "Find the latest trucks on the market",
+    image:<Image src={symbole} alt="bmw" width={48} height={48} />
   },
   {
-    title: "Contact",
-    href: '/contact',
-    description: "contact us"
+    title: "Motorcycles",
+    href: '/motorcycles',
+    description: "Find the latest motorcycles on the market",
+    image:<Image src={symbole} alt="bmw" width={48} height={48} />
   },
+  {
+    title: "Buses",
+    href: '/buses',
+    description: "Find the latest buses on the market",
+    image:<Image src={symbole} alt="bmw" width={48} height={48} />
+  },
+
 ]
 
 export function NavigationsMenu() {
@@ -53,20 +67,48 @@ export function NavigationsMenu() {
           <NavigationMenuItem>
             <NavigationMenuTrigger>Cars</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[300px] gap-4">
+              <ul className="grid  w-[300px] gap-4">
                 {componentsLink.map((link) => (
                   <ListItemLink
                     key={link.title}
                     title={link.title}
                     href={link.href}
+                    className=""
                   >
+                    <div className=" flex justify-between items-center">
+
                     {link.description}
+                    {link.image}
+                    </div>
                   </ListItemLink>
                 ))}
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
+                {/* trucks */}
           <NavigationMenuItem>
+            <NavigationMenuTrigger>Vehicles</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid  w-[300px] gap-4">
+                {componentsVihicles.map((link) => (
+                  <ListItemLink
+                    key={link.title}
+                    title={link.title}
+                    href={link.href}
+                    className=""
+                  >
+                    <div className=" flex justify-between items-center">
+
+                    {link.description}
+                    {link.image}
+                    </div>
+                  </ListItemLink>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          {/* Search */}
+                    <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
               <div className="flex justify-center items-center ">
               <Link href="/Research" className=" flex justify-center items-center ">
@@ -78,33 +120,6 @@ export function NavigationsMenu() {
                 </Link>
               </div>
             </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>With Icon</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid w-[200px] gap-4">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <Link href="#" className="flex-row items-center gap-2">
-                      <CircleHelpIcon />
-                      Backlog
-                    </Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link href="#" className="flex-row items-center gap-2">
-                      <CircleIcon />
-                      To Do
-                    </Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link href="#" className="flex-row items-center gap-2">
-                      <CircleCheckIcon />
-                      Done
-                    </Link>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
-            </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -122,9 +137,9 @@ function ListItemLink({
       <NavigationMenuLink asChild>
         <Link href={href}>
           <div className="text-sm leading-none font-medium">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
+          <div className="text-muted-foreground line-clamp-2 text-sm leading-snug">
             {children}
-          </p>
+          </div>
         </Link>
       </NavigationMenuLink>
     </li>
