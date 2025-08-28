@@ -14,8 +14,8 @@ import NavigationsMenu from "./NavigationMenu";
 
 export default function NavBar() {
     return (
-        <nav className="navbar  gap-3 justify-between items-center border-b border-gray-400 ">
-            <div className=" ">
+        <nav className="navbar  gap-1 justify-around items-center border-b border-gray-400  ">
+            <div >
 
                 {/* icon link  */}
                 <Link href={"/"} className="m-1 text-xl md:text-2xl font-bold lg:text-3xl xl:text-3xl">
@@ -23,9 +23,7 @@ export default function NavBar() {
                         Cars Hub
                     </AuroraText>
                 </Link>
-                <div>
-                    <DropdownMenuLinks />
-                </div>
+
 
             </div>
             {/* navigation menu md => all */}
@@ -46,10 +44,13 @@ export default function NavBar() {
             <div>
                 <LoginSignUpButton />
             </div>
-            
+
             {/* dark mode toggle */}
-            <div>
+            <div className=" flex justify-center items-center gap-4 ">
                 <AnimatedThemeToggler className="bg-none" />
+                <div>
+                    <DropdownMenuLinks />
+                </div>
             </div>
 
             {/* commend CTRL + K to open Commend research */}

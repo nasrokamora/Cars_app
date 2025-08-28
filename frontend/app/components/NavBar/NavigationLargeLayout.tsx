@@ -1,33 +1,79 @@
-import { Button } from "@/components/ui/button"
+"use client"
+// import { Button } from "@/components/ui/button"
 import {
     NavigationMenu,
     NavigationMenuContent,
-    NavigationMenuIndicator,
+    // NavigationMenuIndicator,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
     NavigationMenuTrigger,
+    navigationMenuTriggerStyle,
     NavigationMenuViewport,
 } from "@/components/ui/navigation-menu"
 // import { componentsLink } from "./NavigationMenu"
 import Link from "next/link"
+import { componentsLink, componentsVihicles } from "../Link/ComponentsAllLink"
 // import { ListItemLink } from "./NavigationMenu"
 // import { componentsLink } from "@/app/components/NavBar/NavigationMenu"
 
 
 export default function NavigationsLargeLayout() {
     return (
-        <div>
-            <NavigationMenu>
+        <div className=" sm:flex hidden xs:flex md:hidden lg:hidden xl:hidden 2xl:hidden  ">
+            <NavigationMenu viewport={true} >
                 <NavigationMenuList>
                     <NavigationMenuItem>
-                        <NavigationMenuTrigger>Cars</NavigationMenuTrigger>
+                        <NavigationMenuTrigger>All Vihicles</NavigationMenuTrigger>
                         <NavigationMenuContent>
-                            <NavigationMenuLink>Link</NavigationMenuLink>
+                            <ul className="grid  w-[300px] gap-4">
+
+                                {componentsLink.map((link) => (
+                                    <ListItemLargeLayoutLink
+                                        key={link.title}
+                                        title={link.title}
+                                        href={link.href}
+                                        className=""
+                                    >
+                                        <div className=" flex justify-between items-center">
+                                            {link.description}
+                                            {link.image}
+                                        </div>
+                                    </ListItemLargeLayoutLink>
+                                ))}
+                                {componentsVihicles.map((link) => (
+                                    <ListItemLargeLayoutLink
+                                        key={link.title}
+                                        title={link.title}
+                                        href={link.href}
+                                        className=""
+                                    >
+                                        <div className=" flex justify-between items-center">
+                                            {link.description}
+                                            {link.image}
+                                        </div>
+                                    </ListItemLargeLayoutLink>
+                                ))}
+                            </ul>
                         </NavigationMenuContent>
                     </NavigationMenuItem>
+
+                    {/* Search */}
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                            <div className="flex justify-center items-center ">
+                                <Link href="/Research" className=" flex justify-center items-center ">
+                                    Research
+                                    <div className="text-white pl-2">
+                                        <kbd className="kbd kbd-sm mr-1 ">⌘</kbd>
+                                        <kbd className="kbd kbd-sm ">K</kbd>
+                                    </div>
+                                </Link>
+                            </div>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
                 </NavigationMenuList>
-                  <NavigationMenuViewport />
+                {/* <NavigationMenuViewport /> */}
             </NavigationMenu>
         </div>
     )
@@ -35,16 +81,19 @@ export default function NavigationsLargeLayout() {
 
 function ListItemLargeLayoutLink({
     title,
-    href,
     children,
+    href,
     ...props
 }: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
     return (
         <li {...props}>
-            <Link href={href} className="flex items-center gap-2">
-                <span className="text-sm leading-none font-medium">{title}</span>
-                <div >{children}</div>
-            </Link>
+            <NavigationMenuLink asChild>
+
+                <Link href={href} className="">
+                    <div className="text-sm leading-none font-medium">{title}</div>
+                    <div className="text-muted-foreground line-clamp-2 text-sm leading-snug" >{children}</div>
+                </Link>
+            </NavigationMenuLink>
         </li>
     )
 }
