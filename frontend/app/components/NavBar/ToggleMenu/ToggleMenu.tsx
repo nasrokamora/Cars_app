@@ -33,10 +33,10 @@ export default function ToggleMenu() {
 
             <SheetContent side="left" className="w-78 container overflow-y-scroll p-2  ">
                 <SheetHeader className="">
-                    <SheetTitle className="text-lg font-bold text-[#0268bd]  ">
+                    <SheetTitle className=" text-[#0268bd]  ">
                         <SheetClose asChild>
 
-                            <Link href="/" className="active:bg-gradient-to-l active:text-transparent active:bg-clip-text active:from-amber-700 active:to-blue-600 duration-300 active:scale-95 transition-transform">Cars Hub</Link>
+                            <Link href="/" className=" bg-gradient-to-br from-blue-500 to-sky-400 text-transparent bg-clip-text text-2xl font-bold">Cars Hub</Link>
                         </SheetClose>
                     </SheetTitle>
                 </SheetHeader>
@@ -68,9 +68,9 @@ export default function ToggleMenu() {
                             {link.image}
                         </ToggleItemLink>
                     ))}
-                <Separator className="text-blue-500 font-bold text-md mt-1" />
+                    <Separator className="text-blue-500 font-bold text-md mt-1" />
                 </ul>
-                                <Separator className="text-blue-500  " />
+                <Separator className="text-blue-500  " />
                 <div className="flex justify-evenly items-center mt-5">
 
                     {AboutContactLinks.map((link) => (
@@ -82,7 +82,7 @@ export default function ToggleMenu() {
                 </div>
 
 
-                    <FooterCRH />
+                <FooterCRH />
             </SheetContent>
         </Sheet>
     );
@@ -98,7 +98,7 @@ function ToggleItemLink({
     return (
         <li {...props}>
             <SheetClose asChild>
-                <Link href={href} className="w-full flex justify-around items-center  bg-[#095d6e] rounded-lg btn border-none h-auto active:scale-95 transition-transform duration-150">
+                <Link href={href} className="w-full flex justify-around items-center   bg-gradient-to-br from-[#0066b7] to-sky-400 rounded-lg btn border-none h-auto active:scale-95 transition-transform duration-150">
                     <div className="text-xl leading-none font-medium ">{title}</div>
                     <div className="flex  justify-around items-center p-2 text-muted-foreground line-clamp-2  leading-snug">
                         {children}
@@ -107,7 +107,7 @@ function ToggleItemLink({
 
                 </Link>
             </SheetClose>
-            
+
         </li>
     )
 }

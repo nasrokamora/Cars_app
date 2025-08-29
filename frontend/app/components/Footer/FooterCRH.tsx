@@ -1,13 +1,16 @@
+"use client"
 import Link from "next/link";
-import React from "react";
+import * as React from "react"
 // استخدم مكونات shadcn/ui المتاحة في مشروعك
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { FaFacebook } from "react-icons/fa";
 import { BsInstagram } from "react-icons/bs";
 import { CiLinkedin } from "react-icons/ci";
 export default function FooterCRH() {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const handleClose = () => {
+        setIsOpen(false)
+    }
     const linkColumns = [
         {
             title: "Explore",
@@ -62,13 +65,13 @@ export default function FooterCRH() {
 
                         <div className="flex items-center gap-3 pt-4">
 
-                            <Link  className="p-2 rounded-md hover:bg-slate-800" href={''}>
+                            <Link className="p-2 rounded-md hover:bg-slate-800" href={''}>
                                 <CiLinkedin className="w-5 h-5" />
                             </Link>
-                            <Link  className="p-2 rounded-md hover:bg-slate-800" href={''}>
+                            <Link className="p-2 rounded-md hover:bg-slate-800" href={''}>
                                 <FaFacebook className="w-5 h-5" />
                             </Link>
-                            <Link  className="p-2 rounded-md hover:bg-slate-800" href={''}>
+                            <Link className="p-2 rounded-md hover:bg-slate-800" href={''}>
                                 <BsInstagram className="w-5 h-5" />
                             </Link>
                         </div>
@@ -82,7 +85,7 @@ export default function FooterCRH() {
                                 <ul className="space-y-2">
                                     {col.links.map((l) => (
                                         <li key={l.href}>
-                                            <Link href={l.href} className="text-sm text-slate-300 hover:text-white transition">
+                                            <Link href={l.href} className="text-sm text-slate-300 hover:text-white transition" onClick={handleClose}>
                                                 {l.title}
                                             </Link>
                                         </li>
