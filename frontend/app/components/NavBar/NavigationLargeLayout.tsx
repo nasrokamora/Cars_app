@@ -20,7 +20,7 @@ import { componentsLink, componentsVihicles } from "../Link/ComponentsAllLink"
 
 export default function NavigationsLargeLayout() {
     return (
-        <div className=" flex sm:hidden xs:flex md:hidden lg:hidden xl:hidden 2xl:hidden ">
+        <div className=" hidden sm:hidden xs:flex md:hidden lg:hidden xl:hidden 2xl:hidden ">
             <NavigationMenu viewport={true} >
                 <NavigationMenuList>
                     <NavigationMenuItem>
@@ -59,7 +59,7 @@ export default function NavigationsLargeLayout() {
                     </NavigationMenuItem>
 
                     {/* Search */}
-                    <NavigationMenuItem>
+                    <NavigationMenuItem className="">
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                             <div className="flex justify-center items-center ">
                                 <Link href="/Research" className=" flex justify-center items-center ">

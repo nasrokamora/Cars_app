@@ -10,6 +10,7 @@ import NavigationsLargeLayout from "./NavigationLargeLayout";
 import NavigationsMenu from "./NavigationMenu";
 import Image from "next/image";
 import logoCarHub from '@/public/CarHub_MarketPlace.png'
+import ToggleMenu from "./ToggleMenu/ToggleMenu";
 // import NavigationMenuExample from "./NavigationMenu";
 
 
@@ -36,26 +37,26 @@ export default function NavBar() {
                 <NavigationsMenu />
             </div>
 
-            {/* navigation menu sm => none */}
-
-            {/* <div>
-                <NavigationLargeLayout />
-            </div> */}
+            {/* navigation menu lg => all */}
             <div>
                 <NavigationsLargeLayout />
             </div>
 
-            {/* login and sign up */}
+            {/* login and sign up lg => all */}
             <div>
                 <LoginSignUpButton />
             </div>
 
             {/* dark mode toggle */}
             <div className=" flex justify-center items-center gap-2 ">
-                <AnimatedThemeToggler className="bg-none" />
                 <div className="mr-2">
+                    {/* md => lg */}
                     <DropdownMenuLinks />
                 </div>
+                {/* xs => none */}
+                <ToggleMenu />
+                {/* toggle dark mode */}
+                <AnimatedThemeToggler className="bg-none" />
             </div>
 
             {/* commend CTRL + K to open Commend research */}
