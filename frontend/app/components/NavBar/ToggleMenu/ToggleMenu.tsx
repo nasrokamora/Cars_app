@@ -11,6 +11,9 @@ import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger 
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { componentsLink, componentsVihicles } from "../../Link/ComponentsAllLink";
+import { Separator } from "@/components/ui/separator";
+import FooterCRH from "../../Footer/FooterCRH";
+
 
 export default function ToggleMenu() {
     const AllComponentsLink = [...componentsLink, ...componentsVihicles]
@@ -22,13 +25,13 @@ export default function ToggleMenu() {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="rounded-lg bg-gray-100 dark:bg-none dark:border-none scroll-y-auto flex xs:hidden "
+                    className="rounded-lg bg-gray-100 dark:bg-none dark:border-none  flex xs:hidden "
                 >
                     <Menu className="h-6 w-6 dark:text-white" />
                 </Button>
             </SheetTrigger>
 
-            <SheetContent side="left" className="w-78 container overflow-y-scroll p-2 ">
+            <SheetContent side="left" className="w-78 container overflow-y-scroll p-2  ">
                 <SheetHeader className="">
                     <SheetTitle className="text-lg font-bold text-[#0268bd]  ">
                         <SheetClose asChild>
@@ -61,23 +64,25 @@ export default function ToggleMenu() {
                             title={link.title}
                             href={link.href}
                         >
-                            {link.description}
+                            {/* {link.description} */}
                             {link.image}
                         </ToggleItemLink>
                     ))}
+                <Separator className="text-blue-500 font-bold text-md mt-1" />
                 </ul>
-                <div className="flex justify-evenly items-center mt-8">
+                                <Separator className="text-blue-500  " />
+                <div className="flex justify-evenly items-center mt-5">
 
                     {AboutContactLinks.map((link) => (
                         <div key={link.id} className="flex justify-evenly items-center w-full ">
 
-                        <Link href={link.url}  className="btn border-none h-auto active:scale-95 transition-transform duration-150 rounded-lg text-lg">{link.title}</Link>
+                            <Link href={link.url} className="btn border-none h-auto active:scale-95 transition-transform duration-150 rounded-lg text-lg">{link.title}</Link>
                         </div>
                     ))}
-                    </div>
+                </div>
 
 
-
+                    <FooterCRH />
             </SheetContent>
         </Sheet>
     );
@@ -93,13 +98,16 @@ function ToggleItemLink({
     return (
         <li {...props}>
             <SheetClose asChild>
-                <Link href={href} className=" rounded-lg btn border-none h-auto active:scale-95 transition-transform duration-150">
-                    <div className="text-sm leading-none font-medium ml-2">{title}</div>
-                    <div className="flex justify-evenly items-center pr-2 text-muted-foreground line-clamp-2 text-sm leading-snug">
+                <Link href={href} className="w-full flex justify-around items-center  bg-[#095d6e] rounded-lg btn border-none h-auto active:scale-95 transition-transform duration-150">
+                    <div className="text-xl leading-none font-medium ">{title}</div>
+                    <div className="flex  justify-around items-center p-2 text-muted-foreground line-clamp-2  leading-snug">
                         {children}
+
                     </div>
+
                 </Link>
             </SheetClose>
+            
         </li>
     )
 }
