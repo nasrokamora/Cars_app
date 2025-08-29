@@ -31,10 +31,27 @@ export default function ToggleMenu() {
                     <SheetTitle className="text-lg font-bold text-[#0268bd]  ">
                         <SheetClose asChild>
 
-                            <Link href="/">Cars Hub</Link>
+                            <Link href="/" className="active:bg-gradient-to-l active:text-transparent active:bg-clip-text active:from-amber-700 active:to-blue-600 duration-300 active:scale-95 transition-transform">Cars Hub</Link>
                         </SheetClose>
                     </SheetTitle>
                 </SheetHeader>
+
+                <div>
+                    <div className="flex justify-center  items-center  ">
+                        <SheetClose asChild>
+
+                            <Link href="/Research" className=" font-bold flex justify-center items-center rounded-lg border border-[#0268bd] p-2 w-1/2 active:bg-blue-500 active:text-white duration-300 active:scale-95 transition-transform ">
+                                Research
+                                <div className="text-white pl-2">
+                                    <kbd className="kbd kbd-sm mr-1 ">⌘</kbd>
+                                    <kbd className="kbd kbd-sm ">K</kbd>
+                                </div>
+                            </Link>
+                        </SheetClose>
+                    </div>
+                </div>
+
+
                 <ul className="mt-8 flex flex-col gap-3">
                     {AllComponentsLink.map((link) => (
                         <ToggleItemLink
