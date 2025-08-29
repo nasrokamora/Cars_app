@@ -14,21 +14,21 @@ import { componentsLink, componentsVihicles } from "../../Link/ComponentsAllLink
 
 export default function ToggleMenu() {
     const AllComponentsLink = [...componentsLink, ...componentsVihicles]
-    const neededLinks = ["about", "contact"];
+    const neededLinks = ["About", "Contact"];
     const AboutContactLinks = LinkBar.filter((link) => neededLinks.includes(link.title))
     return (
-        <Sheet  >
+        <Sheet    >
             <SheetTrigger asChild>
                 <Button
                     variant="outline"
                     size="icon"
-                    className="rounded-lg bg-gray-100 dark:bg-none dark:border-none scroll-y-auto hidden "
+                    className="rounded-lg bg-gray-100 dark:bg-none dark:border-none scroll-y-auto flex xs:hidden "
                 >
                     <Menu className="h-6 w-6 dark:text-white" />
                 </Button>
             </SheetTrigger>
 
-            <SheetContent side="left" className="w-78 ">
+            <SheetContent side="left" className="w-78 container overflow-y-scroll p-2 ">
                 <SheetHeader className="">
                     <SheetTitle className="text-lg font-bold text-[#0268bd]  ">
                         <SheetClose asChild>
@@ -65,10 +65,16 @@ export default function ToggleMenu() {
                             {link.image}
                         </ToggleItemLink>
                     ))}
-                    {AboutContactLinks.map((link) => (
-                        <Link href={link.url} key={link.id} className="text-sm leading-none font-medium ml-2">{link.title}</Link>
-                    ))}
                 </ul>
+                <div className="flex justify-evenly items-center mt-8">
+
+                    {AboutContactLinks.map((link) => (
+                        <div key={link.id} className="flex justify-evenly items-center w-full ">
+
+                        <Link href={link.url}  className="btn border-none h-auto active:scale-95 transition-transform duration-150 rounded-lg text-lg">{link.title}</Link>
+                        </div>
+                    ))}
+                    </div>
 
 
 
@@ -87,7 +93,7 @@ function ToggleItemLink({
     return (
         <li {...props}>
             <SheetClose asChild>
-                <Link href={href} className=" btn border-none h-auto active:scale-95 transition-transform duration-150">
+                <Link href={href} className=" rounded-lg btn border-none h-auto active:scale-95 transition-transform duration-150">
                     <div className="text-sm leading-none font-medium ml-2">{title}</div>
                     <div className="flex justify-evenly items-center pr-2 text-muted-foreground line-clamp-2 text-sm leading-snug">
                         {children}
