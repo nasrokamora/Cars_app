@@ -20,7 +20,7 @@ import { componentsLink, componentsVihicles } from "../Link/ComponentsAllLink"
 
 export default function NavigationsLargeLayout() {
     return (
-        <div className=" hidden sm:hidden xs:flex md:hidden lg:hidden xl:hidden 2xl:hidden ">
+        <div className=" hidden sm:flex xs:  md:hidden lg:hidden xl:hidden 2xl:hidden ">
             <NavigationMenu viewport={true} >
                 <NavigationMenuList>
                     <NavigationMenuItem>

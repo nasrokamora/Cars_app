@@ -15,12 +15,12 @@ import { componentsLink, componentsVihicles } from "../../Link/ComponentsAllLink
 export default function ToggleMenu() {
     const AllComponentsLink = [...componentsLink, ...componentsVihicles]
     return (
-        <Sheet >
+        <Sheet  >
             <SheetTrigger asChild>
                 <Button
                     variant="outline"
                     size="icon"
-                    className="rounded-lg bg-gray-100 dark:bg-none dark:border-none scroll-y-auto"
+                    className="rounded-lg bg-gray-100 dark:bg-none dark:border-none scroll-y-auto hidden "
                 >
                     <Menu className="h-6 w-6 dark:text-white" />
                 </Button>
@@ -63,21 +63,6 @@ export default function ToggleMenu() {
                             {link.image}
                         </ToggleItemLink>
                     ))}
-                    {/* <Button variant="outline" className="w-full">
-                        <SheetClose asChild>
-                            <Link href="/auth/login" className="w-full text-center">
-                                Login
-                            </Link>
-                        </SheetClose>
-                    </Button>
-
-                    <Button className="w-full bg-[#0067ba] text-white hover:bg-blue-700">
-                        <SheetClose asChild>
-                            <Link href="/auth/register" className="w-full text-center">
-                                Get Started
-                            </Link>
-                        </SheetClose>
-                    </Button> */}
                 </ul>
 
 
