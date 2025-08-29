@@ -14,6 +14,8 @@ import { componentsLink, componentsVihicles } from "../../Link/ComponentsAllLink
 
 export default function ToggleMenu() {
     const AllComponentsLink = [...componentsLink, ...componentsVihicles]
+    const neededLinks = ["about", "contact"];
+    const AboutContactLinks = LinkBar.filter((link) => neededLinks.includes(link.title))
     return (
         <Sheet  >
             <SheetTrigger asChild>
@@ -62,6 +64,9 @@ export default function ToggleMenu() {
                             {link.description}
                             {link.image}
                         </ToggleItemLink>
+                    ))}
+                    {AboutContactLinks.map((link) => (
+                        <Link href={link.url} key={link.id} className="text-sm leading-none font-medium ml-2">{link.title}</Link>
                     ))}
                 </ul>
 
