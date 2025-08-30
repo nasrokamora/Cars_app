@@ -7,10 +7,7 @@ import { FaFacebook } from "react-icons/fa";
 import { BsInstagram } from "react-icons/bs";
 import { CiLinkedin } from "react-icons/ci";
 export default function FooterCRH() {
-    const [isOpen, setIsOpen] = React.useState(false);
-    const handleClose = () => {
-        setIsOpen(false)
-    }
+
     const linkColumns = [
         {
             title: "Explore",
@@ -85,7 +82,7 @@ export default function FooterCRH() {
                                 <ul className="space-y-2">
                                     {col.links.map((l) => (
                                         <li key={l.href}>
-                                            <Link href={l.href} className="text-sm text-slate-300 hover:text-white transition" onClick={handleClose}>
+                                            <Link href={l.href} className="text-sm text-slate-300 hover:text-white transition" >
                                                 {l.title}
                                             </Link>
                                         </li>

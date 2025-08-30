@@ -9,7 +9,8 @@ import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggle
 import NavigationsLargeLayout from "./NavigationLargeLayout";
 import NavigationsMenu from "./NavigationMenu";
 import Image from "next/image";
-import logoCarHub from '@/public/CarHub_MarketPlace.png'
+import logoCarHub from '@/public/logo_png_Cars_Hub.png'
+import logoCarHub_white_v from '@/public/logo_png_Cars_Hub_white_v.png'
 import ToggleMenu from "./ToggleMenu/ToggleMenu";
 // import NavigationMenuExample from "./NavigationMenu";
 
@@ -25,9 +26,22 @@ export default function NavBar() {
                         Cars Hub
                     </AuroraText>
                 </Link>
+
+                {/* logo link  */}
+                <div className="">
+                    <Link href={"/"} className="">
+                    {/* white mode */}
+                        <Image src={logoCarHub} width={70} height={70} alt="carhub" priority className="dark:hidden" />
+                    
+                    {/* dark mode */}
+                    <Image src={logoCarHub_white_v} width={70} height={70} alt="carhub" priority className="hidden dark:block" />
+                    </Link>
+                </div>
+
+
                 <div className="flex xs:flex lg:hidden xl:hidden 2xl:hidden md:hidden   w-full ">
                     <Link href={"/"}>
-                    <Image src={logoCarHub} width={58} height={58} alt="carhub" priority />
+                        <Image src={logoCarHub} width={58} height={58} alt="carhub" priority />
                     </Link>
                 </div>
 
@@ -53,7 +67,7 @@ export default function NavBar() {
                     {/* md => lg */}
                     <DropdownMenuLinks />
                 </div>
-                {/* xs => none */}
+                {/* xs => md */}
                 <ToggleMenu />
                 {/* toggle dark mode */}
                 <AnimatedThemeToggler className="bg-none" />

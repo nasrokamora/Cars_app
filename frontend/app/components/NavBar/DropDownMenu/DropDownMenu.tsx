@@ -9,12 +9,16 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Car, User } from "lucide-react"
+import { useState } from "react";
+
 // import Image from "next/image";
 // import LogoImage from "@/public/CarHub_MarketPlace.png"
 export function DropdownMenuLinks() {
+
+    const [open, setOpen] = useState(false);
     return (
         <div className="sm:hidden  mr-3">
-            <Popover >
+            <Popover open={open} onOpenChange={setOpen} >
 
                 <PopoverTrigger asChild >
                     <Button variant="outline" className="flex items-center gap-2">
@@ -24,7 +28,7 @@ export function DropdownMenuLinks() {
                 </PopoverTrigger>
 
                 {/* المحتوى */}
-                <PopoverContent className="w-64 p-4 space-y-4 rounded-2xl shadow-md">
+                <PopoverContent className="w-64 p-4 space-y-4 rounded-2xl shadow-md mr-4 sm:mr-4">
                     <div className="text-center mb-2">
                         <h3 className="text-lg font-semibold">Welcome to AutoMarket 🚗</h3>
                         <p className="text-sm text-muted-foreground">
@@ -32,14 +36,14 @@ export function DropdownMenuLinks() {
                         </p>
                     </div>
 
-                    <Button variant="outline" className="w-full flex gap-2">
+                    <Button variant="outline" className="w-full flex gap-2" onClick={() => setOpen(false)}>
                         <Car className="w-4 h-4 text-blue-600" />
                         <Link href="/auth/login" className="w-full text-center">
                             Login
                         </Link>
                     </Button>
 
-                    <Button className="w-full bg-[#0067ba] text-white hover:bg-blue-700 flex gap-2">
+                    <Button className="w-full bg-[#0067ba] text-white hover:bg-blue-700 flex gap-2" onClick={() => setOpen(false)}>
                         <Car className="w-4 h-4 text-white" />
                         <Link href="/auth/register" className="w-full text-center">
                             Get Started

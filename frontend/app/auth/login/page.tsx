@@ -13,11 +13,16 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link";
+import Image from "next/image";
+import futuristicCar from '@/public/all_image_cars/carRental.png'
 export default function LoginPage() {
     return (
-        <div className=" flex justify-center items-center h-screen">
+        <div className=" flex justify-center items-center h-screen relative">
+            <div className="w-full">
 
-        <Card className="w-full max-w-sm text-3xl bg-blue-500 glass  ">
+        <Image src={futuristicCar} fill alt="futuristic_car" className="object-cover blur-md "  placeholder="blur" priority />
+            </div>
+        <Card className="w-full max-w-sm text-3xl bg-gradient-to-br from-blue-500 to-sky-400/30 glass backdrop-blur absolute shadow-3xl shadow-sky-400 border-[#cd090a] border  ">
             <CardHeader>
                 <CardTitle>Login to your account</CardTitle>
                 <CardDescription className="text-white">
