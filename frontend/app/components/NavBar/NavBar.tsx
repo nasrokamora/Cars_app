@@ -41,7 +41,7 @@ export default function NavBar() {
 
                 <div className="flex xs:flex lg:hidden xl:hidden 2xl:hidden md:hidden   w-full ">
                     <Link href={"/"}>
-                        <Image src={logoCarHub} width={58} height={58} alt="carhub" priority />
+                        <Image src={logoCarHub} width={58} height={58} alt="carhub" priority placeholder="blur" />
                     </Link>
                 </div>
 
