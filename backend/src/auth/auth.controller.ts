@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Req,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from 'src/users/decorator/user.decorator';
 import { AuthUser } from 'src/users/types/user.types';
 import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -30,9 +32,19 @@ export class AuthController {
   // مسار تسجيل الدخول (Login) باستخدام الحارس المحلي (LocalAuthGuard)
   @UseGuards(LocalAuthGuard) // هذا الحارس يحقّق البريد وكلمة المرور أولًا
   @Post('/login')
-  login(@Req() req: AuthenticatedUserRequest) {
+  login(
+    @Req() req: AuthenticatedUserRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     // بعد نجاح الحارس، يكون req.user مُضمّنًا
-    return this.authService.login(req.user);
+    const data = this.authService.login(req.user);
+    res.cookie('access_token', data.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    return data.user;
+    // return this.authService.login(req.user);
   }
 
   @UseInterceptors(RemovePasswordInterceptor)
