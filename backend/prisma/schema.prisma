@@ -19,7 +19,7 @@ model User {
   email     String    @unique // عنوان البريد الإلكتروني (مفرد وحصري)
   password  String // كلمة المرور (سنخزّنها مشفّرة)
   username  String    @unique
-  role      String    @default("USER") // دور المستخدم (مثل USER أو ADMIN)
+  role      Role      @default(USER) // دور المستخدم (مثل USER أو ADMIN)
   cars      Car[]
   messages  Message[] @relation("UserMessages")
   createdAt DateTime  @default(now()) // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
@@ -39,7 +39,7 @@ model Car {
   price       Float
   brand       Brand     @relation(fields: [brandId], references: [id])
   brandId     String
-  category    Category?  @relation(fields: [categoryId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  String?
   images      Image[]   @relation("CarImages")
   owner       User      @relation(fields: [ownerid], references: [id])
@@ -57,9 +57,10 @@ model Brand {
 model Image {
   id         String   @id @default(uuid())
   url        String
-  car        Car      @relation("CarImages", fields: [carId], references: [id])
-  carId      String
+  car        Car?      @relation("CarImages", fields: [carId], references: [id])
+  carId      String?
   uploadedBy User     @relation(fields: [userId], references: [id])
+  avatarUrl  String?
   userId     String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

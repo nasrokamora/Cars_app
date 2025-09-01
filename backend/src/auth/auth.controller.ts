@@ -23,6 +23,23 @@ import { Response } from 'express';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Post('refresh')
+  async refresh(
+    @Req() req: AuthenticatedUserRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { access_token, refresh_token } = await this.authService.login(
+      req.user,
+    );
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/auth/refresh',
+    });
+    return { access_token };
+  }
+
   // مسار التسجيل (Sign Up)
   @Post('/signup')
   async signup(@Body() createUserDto: CreateUserDto) {
