@@ -15,16 +15,29 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
-  email     String    @unique // عنوان البريد الإلكتروني (مفرد وحصري)
-  password  String // كلمة المرور (سنخزّنها مشفّرة)
-  username  String    @unique
-  role      Role      @default(USER) // دور المستخدم (مثل USER أو ADMIN)
-  cars      Car[]
-  messages  Message[] @relation("UserMessages")
-  createdAt DateTime  @default(now()) // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
-  updatedAt DateTime  @updatedAt // تاريخ التحديث (يتغيّر تلقائيًا عند التعديل)
-  images    Image[]
+  id            String         @id @default(uuid()) // معرف المستخدم (رقمي، متزايد تلقائيًا)
+  email         String         @unique // عنوان البريد الإلكتروني (مفرد وحصري)
+  password      String // كلمة المرور (سنخزّنها مشفّرة)
+  username      String         @unique
+  role          Role           @default(USER) // دور المستخدم (مثل USER أو ADMIN)
+  cars          Car[]
+  messages      Message[]      @relation("UserMessages")
+  createdAt     DateTime       @default(now()) // تاريخ الإنشاء (الافتراضي: الوقت الحالي)
+  updatedAt     DateTime       @updatedAt // تاريخ التحديث (يتغيّر تلقائيًا عند التعديل)
+  images        Image[]
+  refreshTokens RefreshToken[] // علاقة مع جدول الريفريش
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  tokenHash  String
+  userId     String
+  User       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime // صلاحية التوكين
+  revokedAt DateTime? //null = مازال صالح، غير null = مرفوض
+  ip         String? // اختياري: تخزين IP
+  userAgent  String? // اختياري: تخزين نوع الجهاز/المتصفح
 }
 
 enum Role {
@@ -57,7 +70,7 @@ model Brand {
 model Image {
   id         String   @id @default(uuid())
   url        String
-  car        Car?      @relation("CarImages", fields: [carId], references: [id])
+  car        Car?     @relation("CarImages", fields: [carId], references: [id])
   carId      String?
   uploadedBy User     @relation(fields: [userId], references: [id])
   avatarUrl  String?
