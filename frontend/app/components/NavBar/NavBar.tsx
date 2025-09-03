@@ -9,7 +9,7 @@ import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggle
 import NavigationsLargeLayout from "./NavigationLargeLayout";
 import NavigationsMenu from "./NavigationMenu";
 import Image from "next/image";
-import logoCarHub from '@/public/logo_png_Cars_Hub.png'
+import logoCarHub from '@/public/logo_Cars_Hub.png'
 import logoCarHub_white_v from '@/public/logo_png_Cars_Hub_white_v.png'
 import ToggleMenu from "./ToggleMenu/ToggleMenu";
 // import NavigationMenuExample from "./NavigationMenu";
@@ -31,19 +31,13 @@ export default function NavBar() {
                 <div className="">
                     <Link href={"/"} className="">
                     {/* white mode */}
-                        <Image src={logoCarHub} width={70} height={70} alt="carhub" priority className="dark:hidden" />
+                        <Image src={logoCarHub} width={70} height={70} alt="logo_carhub_black" priority className="dark:hidden"  placeholder="blur"/>
                     
                     {/* dark mode */}
-                    <Image src={logoCarHub_white_v} width={70} height={70} alt="carhub" priority className="hidden dark:block" />
+                    <Image src={logoCarHub_white_v} width={70} height={70} alt="logo_carhub_white" priority className="hidden dark:block "  placeholder="blur"/>
                     </Link>
                 </div>
 
-
-                <div className="flex xs:flex lg:hidden xl:hidden 2xl:hidden md:hidden   w-full ">
-                    <Link href={"/"}>
-                        <Image src={logoCarHub} width={58} height={58} alt="carhub" priority placeholder="blur" />
-                    </Link>
-                </div>
 
             </div>
             {/* navigation menu md => all */}
