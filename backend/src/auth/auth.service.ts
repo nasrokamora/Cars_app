@@ -9,12 +9,14 @@ import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المر
 
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from '@prisma/client';
+import { RefreshTokenService } from './refreshToken/refresh-token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly refreshTokenService: RefreshTokenService,
     // private readonly logger: Logger = new Logger(AuthService.name),
   ) {}
 
@@ -33,16 +35,41 @@ export class AuthService {
     return user; // إعادة البيانات بدون كلمة المرور
   }
 
-  // تسجيل الدخول
+  async getToken(userId: string, email: string) {
+    const payload = { email, sub: userId };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+      }),
+    ]);
 
-  login(user: User) {
+    return { accessToken, refreshToken };
+  }
+
+  // تسجيل الدخول
+  async login(user: User, ip?: string, userAgent?: string) {
     if (!user) throw new BadGatewayException('Invalid credentials');
 
-    const payload = { email: user.email, sub: user.id };
-    // 2. إعداد الحمولة Payload للتوكن
-    const token = this.jwtService.sign(payload);
+    const tokens = await this.getToken(user.id, user.email);
+    // 1. إنشاء refresh token وتخزينه في DB
+    // 1.1. إنشاء توكن جديد
+    // 1.2. تخزينه في DB
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
+    await this.refreshTokenService.create(
+      user.id,
+      tokens.refreshToken,
+      expiresAt,
+      ip,
+      userAgent,
+    );
     return {
-      accessToken: token,
+      ...tokens,
       user: {
         id: user.id,
         email: user.email,
