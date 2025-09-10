@@ -70,4 +70,7 @@ export class AuthController {
   getProfile(@User() user: AuthUser): AuthUser {
     return user;
   }
+  async logout(@Req() req: AuthenticatedUserRequest) {
+    return await this.authService.logout(req.user);
+  }
 }
