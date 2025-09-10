@@ -78,6 +78,30 @@ export class AuthService {
     };
   }
 
+  //تحديث التوكينات عبر refresh token
+  async refreshTokens(userId: string, refreshToken: string) {
+    // 1. التحقق من صحة ال refresh token
+    const isValid = await this.refreshTokenService.validate(
+      userId,
+      refreshToken,
+    );
+    if (!isValid) throw new UnauthorizedException('Invalid refresh token');
+
+    const token = await this.getToken(userId, '');
+
+    //نلغي كل التوكينات القديمة وننشئ توكن جديد
+    await this.refreshTokenService.revokedAll(userId);
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
+    await this.refreshTokenService.create(
+      userId,
+      token.refreshToken,
+      expiresAt,
+    );
+    return token;
+  }
+
   // تسجيل مستخدم جديد
   async signup(createUserDto: CreateUserDto) {
     try {
