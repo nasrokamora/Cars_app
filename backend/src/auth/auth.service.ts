@@ -93,6 +93,7 @@ export class AuthService {
     await this.refreshTokenService.revokedAll(userId);
 
     const expiresAt = new Date();
+    // صلاحية ال refresh token لمدة 7 أيام
     expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
     await this.refreshTokenService.create(
       userId,
@@ -102,15 +103,40 @@ export class AuthService {
     return token;
   }
 
+  // تسجيل الخروج من جهاز معين
+  async logoutFromDevice(userId: string) {
+    await this.refreshTokenService.revokedById(userId);
+  }
+
+  // تسجيل الخروج من جميع الأجهزة
+  async logoutFromAllDevice(tokenId: string) {
+    await this.refreshTokenService.revokedAll(tokenId);
+  }
+
   // تسجيل مستخدم جديد
-  async signup(createUserDto: CreateUserDto) {
+  async signup(createUserDto: CreateUserDto, ip?: string, userAgent?: string) {
     try {
       const user = await this.userService.createUser(createUserDto);
-      const payload = { email: user.email, sub: user.id };
-      const token = await this.jwtService.signAsync(payload);
+
+      const tokens = await this.getToken(user.id, user.email);
+
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+      await this.refreshTokenService.create(
+        user.id,
+        tokens.refreshToken,
+        expiresAt,
+        ip,
+        userAgent,
+      );
       return {
-        accessToken: token,
-        user,
+        ...tokens,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          username: user.username,
+        },
       };
     } catch (error) {
       const errorMessage =

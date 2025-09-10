@@ -50,12 +50,18 @@ export class RefreshTokenService {
   async revokedAll(userId: string) {
     await this.prisma.refreshToken.updateMany({
       where: {
-        userId,
+        userId: userId,
         revokedAt: null,
       },
       data: { revokedAt: new Date() },
     });
   }
-
   // إبطال توكن واحد (مثلاً لو استخدم جهاز واحد logout)
+
+  async revokedById(id: string) {
+    await this.prisma.refreshToken.update({
+      where: { id },
+      data: { revokedAt: new Date() },
+    });
+  }
 }
