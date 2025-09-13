@@ -5,9 +5,12 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     role: string; // Assuming role is a string, adjust as necessary
     userId: string; // This is the user ID from the JWT payload
+    username: string;
   };
 }
 
-export interface AuthenticatedUserRequest extends Request {
+export interface AuthenticatedUserRequest
+  extends Request,
+    Omit<User, 'password'> {
   user: User;
 }
