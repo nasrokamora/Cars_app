@@ -1,28 +1,22 @@
 import {
   Body,
   Controller,
-  Get,
-  Ip,
   Post,
   Req,
   Res,
   UnauthorizedException,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+// import { LocalAuthGuard } from './guards/local-auth.guard';
 
-import {
-  AuthenticatedRequest,
-  AuthenticatedUserRequest,
-} from './types/authenticatedReq.type';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from 'src/users/decorator/user.decorator';
 import { AuthUser } from 'src/users/types/user.types';
-import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
+// import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
 import { Request, Response } from 'express';
+import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 
 @Controller('auth')
 export class AuthController {
@@ -81,6 +75,7 @@ export class AuthController {
   // -------------------------
   // refresh token
   // -------------------------
+  @UseGuards(JwtAuthGuard)
   @Post('/refresh')
   async refresh(
     @Req() req: Request,
@@ -91,21 +86,59 @@ export class AuthController {
       return { message: 'No refresh token provided' };
     }
 
-    // عادةً نستخرج userId من الـ JWT payload أو من DB
-    const payload: AuthenticatedRequest = await this.authService[
-      'jwtService'
-    ].verifyAsync(refreshToken, { secret: process.env.JWT_SECRET });
+    try {
+      // عادةً نستخرج userId من الـ JWT payload أو من DB
+      const payload = await this.authService[
+        'jwtService'
+      ].verifyAsync<JwtRefreshPayload>(refreshToken, {
+        secret: process.env.JWT_SECRET,
+      });
 
-    const { accessToken, refreshToken: newRefresh } =
-      await this.authService.refreshTokens(payload.sub, refreshToken);
+      const { accessToken, refreshToken: newRefresh } =
+        await this.authService.refreshTokens(payload.sub, refreshToken);
 
-    res.cookie('refresh_token', newRefresh, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/auth/refresh',
-    });
+      res.cookie('refresh_token', newRefresh, this.cookieOptionsRefresh());
 
-    return { accessToken };
+      return { accessToken };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  // -------------------------
+  // Logout
+  // -------------------------
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  async logout(
+    @User() user: AuthUser,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies?.['refresh_token'] as string | undefined;
+    if (refreshToken) {
+      await this.authService.logoutFromDevice(user.id, refreshToken);
+    }
+    res.clearCookie('access_token', this.cookieOptionsAccess());
+    res.clearCookie('refresh_token', this.cookieOptionsRefresh());
+    return { message: 'Logged out successfully' };
+  }
+
+  @Post('logout-all')
+  @UseGuards(JwtAuthGuard)
+  async logoutAll(
+    @User() user: AuthUser,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logoutFromAllDevice(user.id);
+
+    res.clearCookie('access_token', this.cookieOptionsAccess());
+    res.clearCookie('refresh_token', this.cookieOptionsRefresh());
+    return { message: 'Logged out from all devices successfully' };
   }
 }

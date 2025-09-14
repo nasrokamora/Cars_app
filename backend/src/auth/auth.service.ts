@@ -104,13 +104,13 @@ export class AuthService {
   }
 
   // تسجيل الخروج من جهاز معين
-  async logoutFromDevice(userId: string) {
-    await this.refreshTokenService.revokedById(userId);
+  async logoutFromDevice(userId: string, refreshToken: string) {
+    await this.refreshTokenService.revokedById(userId, refreshToken);
   }
 
   // تسجيل الخروج من جميع الأجهزة
-  async logoutFromAllDevice(tokenId: string) {
-    await this.refreshTokenService.revokedAll(tokenId);
+  async logoutFromAllDevice(userId: string) {
+    await this.refreshTokenService.revokedAll(userId);
   }
 
   // تسجيل مستخدم جديد
