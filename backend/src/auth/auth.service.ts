@@ -8,8 +8,9 @@ import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
 
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { User } from '@prisma/client';
+
 import { RefreshTokenService } from './refreshToken/refresh-token.service';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 
 @Injectable()
 export class AuthService {
@@ -52,13 +53,19 @@ export class AuthService {
   }
 
   // تسجيل الدخول
-  async login(user: User, ip?: string, userAgent?: string) {
+  async login(
+    authCredentialsDto: AuthCredentialsDto,
+    ip?: string,
+    userAgent?: string,
+  ) {
+    const user = await this.validateUser(
+      authCredentialsDto.email,
+      authCredentialsDto.password,
+    );
     if (!user) throw new BadGatewayException('Invalid credentials');
 
     const tokens = await this.getToken(user.id, user.email);
-    // 1. إنشاء refresh token وتخزينه في DB
-    // 1.1. إنشاء توكن جديد
-    // 1.2. تخزينه في DB
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
     await this.refreshTokenService.create(
@@ -73,6 +80,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        username: user.username,
         role: user.role,
       },
     };

@@ -17,6 +17,8 @@ import { AuthUser } from 'src/users/types/user.types';
 // import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
 import { Request, Response } from 'express';
 import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
+// import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -108,9 +110,34 @@ export class AuthController {
     }
   }
 
-  // -------------------------
-  // Logout
-  // -------------------------
+  @Post('login')
+  async login(
+    @Body() authCredentialsDto: AuthCredentialsDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const ip = req.ip;
+    const userAgent = req.get('user-agent') || '';
+
+    const { accessToken, refreshToken, user } = await this.authService.login(
+      authCredentialsDto,
+      ip,
+      userAgent,
+    );
+
+    res.cookie(
+      process.env.ACCESS_COOKIE_NAME || 'access_token',
+      accessToken,
+      this.cookieOptionsAccess(),
+    );
+    res.cookie(
+      process.env.REFRESH_COOKIE_NAME || 'refresh_token',
+      refreshToken,
+      this.cookieOptionsRefresh(),
+    );
+
+    return { user };
+  }
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
