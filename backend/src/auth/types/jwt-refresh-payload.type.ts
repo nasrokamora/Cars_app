@@ -19,4 +19,8 @@ export type JwtRefreshPayload = {
    * The date and time when the token will expire.
    */
   exp: number;
+  /**
+   * The unique identifier for the token itself.
+   */
+  jti: string;
 };

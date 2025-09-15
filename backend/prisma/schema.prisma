@@ -31,13 +31,15 @@ model User {
 model RefreshToken {
   id         String    @id @default(uuid())
   tokenHash  String
+  jti        String    @unique // <<-- jti مميز لكل توكن (UUID)
   userId     String
   User       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())
   expiresAt  DateTime // صلاحية التوكين
-  revokedAt DateTime? //null = مازال صالح، غير null = مرفوض
+  revokedAt  DateTime? //null = مازال صالح، غير null = مرفوض
   ip         String? // اختياري: تخزين IP
   userAgent  String? // اختياري: تخزين نوع الجهاز/المتصفح
+  replacedBy String?
 }
 
 enum Role {

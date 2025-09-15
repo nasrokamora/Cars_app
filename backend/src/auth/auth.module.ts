@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'; // لقراءة م
 import { JwtStrategy } from './strategies/jwt.strategy'; // استراتيجية JWT
 import { LocalStrategy } from './strategies/local.strategy'; // استراتيجية Local (مبنية على البريد وكلمة المرور)
 import { UsersModule } from 'src/users/users.module';
+import { RefreshTokenService } from './refreshToken/refresh-token.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UsersModule } from 'src/users/users.module';
     AuthService, // نقدم AuthService
     LocalStrategy, // نقدم استراتيجية Local
     JwtStrategy, // نقدم استراتيجية JWT
+    RefreshTokenService, // نقدم خدمة RefreshToken
   ],
   controllers: [AuthController], // نقدم AuthController للتعامل مع المسارات
 })

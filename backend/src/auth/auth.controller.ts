@@ -24,6 +24,26 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // Helper: يحوّل قيم مثل '15m','7d','3600s' أو أرقام إلى milliseconds
+  private parseExpiryToMs(value?: string | number, fallback = 15 * 60 * 1000) {
+    if (!value) return fallback;
+    const v = String(value).trim();
+    if (/^\d+$/.test(v)) {
+      const n = Number(v);
+      // لو العدد كبير نفترض مليثانية، أما لو صغير نفترض ثواني
+      return n > 1000 ? n : n * 1000;
+    }
+    const m = v.match(/^(\d+)([smhd])$/);
+    if (m) {
+      const n = Number(m[1]);
+      const unit = m[2];
+      if (unit === 's') return n * 1000;
+      if (unit === 'm') return n * 60 * 1000;
+      if (unit === 'h') return n * 3600 * 1000;
+      if (unit === 'd') return n * 24 * 3600 * 1000;
+    }
+    return fallback;
+  }
   private cookieOptionsAccess() {
     return {
       httpOnly: true,
@@ -33,7 +53,8 @@ export class AuthController {
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'strict' as const,
       path: '/',
-      maxAge: Number(process.env.JWT_EXPIRES_IN) || 15 * 60 * 1000, // 15 minutes
+      maxAge:
+        this.parseExpiryToMs(process.env.JWT_EXPIRES_IN) || 15 * 60 * 1000, // 15 minutes
     };
   }
 
@@ -41,13 +62,14 @@ export class AuthController {
     return {
       httpOnly: true,
       secure:
-        process.env.COOKIE_SECURE === 'true' ||
+        process.env.COOKIE_SECURE === 'false' ||
         process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'strict' as const,
       path: '/auth/refresh',
       maxAge:
-        Number(process.env.JWT_REFRESH_EXPIRES_IN) || 7 * 24 * 60 * 60 * 1000, // 7 days
+        this.parseExpiryToMs(process.env.JWT_REFRESH_EXPIRES_IN) ||
+        7 * 24 * 60 * 60 * 1000, // 7 days
     };
   }
 
@@ -83,21 +105,20 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.['refresh_token'] as string | undefined;
-    if (!refreshToken) {
+    const presented = req.cookies?.['refresh_token'] as string | undefined;
+    if (!presented) {
       return { message: 'No refresh token provided' };
     }
 
     try {
       // عادةً نستخرج userId من الـ JWT payload أو من DB
-      const payload = await this.authService[
-        'jwtService'
-      ].verifyAsync<JwtRefreshPayload>(refreshToken, {
-        secret: process.env.JWT_SECRET,
-      });
 
       const { accessToken, refreshToken: newRefresh } =
-        await this.authService.refreshTokens(payload.sub, refreshToken);
+        await this.authService.refreshTokens(
+          presented,
+          req.ip,
+          req.get('user-agent') || '',
+        );
 
       res.cookie('refresh_token', newRefresh, this.cookieOptionsRefresh());
 
@@ -146,9 +167,21 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.['refresh_token'] as string | undefined;
-    if (refreshToken) {
-      await this.authService.logoutFromDevice(user.id, refreshToken);
+    const presented = req.cookies?.['refresh_token'] as string | undefined;
+    if (presented) {
+      try {
+        const payload = await this.authService[
+          'jwtService'
+        ].verifyAsync<JwtRefreshPayload>(presented, {
+          secret: process.env.JWT_SECRET,
+        });
+        const jti = payload?.jti as string | undefined;
+        if (jti) {
+          await this.authService.logoutFromDevice(user.id, jti);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
     res.clearCookie('access_token', this.cookieOptionsAccess());
     res.clearCookie('refresh_token', this.cookieOptionsRefresh());

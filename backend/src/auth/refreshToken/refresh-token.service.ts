@@ -16,12 +16,15 @@ export class RefreshTokenService {
     expiresAt: Date,
     ip?: string,
     userAgent?: string,
+    jti?: string,
   ) {
     //نقوم بانشاء تشفير لل refresh token بستخدام bcrypt
     const tokenHash = await bcrypt.hash(refreshToken, this.SALT_ROUNDS);
-    return this.prisma.refreshToken.create({
+    const jtiValue = jti ?? 'default-jti-value'; // تعيين قيمة افتراضية إذا كانت jti غير معرفة
+    return await this.prisma.refreshToken.create({
       data: {
         userId,
+        jti: jtiValue,
         tokenHash,
         expiresAt,
         ip,
@@ -29,6 +32,22 @@ export class RefreshTokenService {
       },
     });
   }
+
+  async findByJti(jti: string) {
+    return await this.prisma.refreshToken.findUnique({
+      where: {
+        jti,
+      },
+    });
+  }
+
+  async revokeByJti(jti: string, userId: string, replacedBy?: string) {
+    return await this.prisma.refreshToken.updateMany({
+      where: { jti, userId, revokedAt: null },
+      data: { revokedAt: new Date(), replacedBy },
+    });
+  }
+
   //نتحقق من وجود refresh token في DB function
 
   async validate(userId: string, refreshToken: string): Promise<boolean> {

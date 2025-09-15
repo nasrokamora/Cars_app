@@ -11,6 +11,8 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 import { RefreshTokenService } from './refreshToken/refresh-token.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { randomUUID } from 'crypto';
+import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 
 @Injectable()
 export class AuthService {
@@ -36,23 +38,51 @@ export class AuthService {
     return user; // إعادة البيانات بدون كلمة المرور
   }
 
-  async getToken(userId: string, email: string) {
-    const payload = { email, sub: userId };
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
+  private async generateTokens(userId: string, email?: string) {
+    const jti = randomUUID(); // إنشاء معرف فريد لكل توكن
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: userId,
+        email,
+      },
+      {
         secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
-      }),
-    ]);
+        expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+      },
+    );
 
-    return { accessToken, refreshToken };
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        sub: userId,
+        email,
+      },
+      {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+        jwtid: jti,
+      },
+    );
+    return { accessToken, refreshToken, jti };
   }
 
+  // async getToken(userId: string, email: string) {
+  //   const payload = { email, sub: userId };
+  //   const [accessToken, refreshToken] = await Promise.all([
+  //     this.jwtService.signAsync(payload, {
+  //       secret: process.env.JWT_SECRET,
+  //       expiresIn: process.env.JWT_EXPIRES_IN,
+  //     }),
+  //     this.jwtService.signAsync(payload, {
+  //       secret: process.env.JWT_SECRET,
+  //       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  //     }),
+  //   ]);
+
+  //   return { accessToken, refreshToken };
+  // }
+
   // تسجيل الدخول
+
   async login(
     authCredentialsDto: AuthCredentialsDto,
     ip?: string,
@@ -64,52 +94,177 @@ export class AuthService {
     );
     if (!user) throw new BadGatewayException('Invalid credentials');
 
-    const tokens = await this.getToken(user.id, user.email);
+    const { accessToken, refreshToken, jti } = await this.generateTokens(
+      user.id,
+      user.email,
+    );
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
+
     await this.refreshTokenService.create(
       user.id,
-      tokens.refreshToken,
+      refreshToken,
       expiresAt,
       ip,
       userAgent,
+      jti, // تمرير jti إلى خدمة توكن التحديث
     );
+
     return {
-      ...tokens,
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
-        username: user.username,
         role: user.role,
+        username: user.username,
       },
     };
   }
+  // // async login(
+  // //   authCredentialsDto: AuthCredentialsDto,
+  // //   ip?: string,
+  // //   userAgent?: string,
+  // // ) {
+  // //   const user = await this.validateUser(
+  // //     authCredentialsDto.email,
+  // //     authCredentialsDto.password,
+  // //   );
+  // //   if (!user) throw new BadGatewayException('Invalid credentials');
+
+  // //   const { accessToken, refreshToken, jti } = await this.generateTokens(
+  // //     user.id,
+  // //     user.email,
+  // //   );
+
+  // //   const expiresAt = new Date();
+  // //   expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
+
+  // //   await this.refreshTokenService.create(
+  // //     user.id,
+  // //     await refreshToken,
+  // //     expiresAt,
+  // //     ip,
+  // //     userAgent,
+  // //     jti, // تمرير jti إلى خدمة توكن التحديث
+  // //   );
+  // //   return {
+  // //     accessToken,
+  // //     refreshToken,
+  // //     user: {
+  // //       id: user.id,
+  // //       email: user.email,
+  // //       role: user.role,
+  // //       username: user.username,
+  // //     },
+  // //   };
+  // // }
 
   //تحديث التوكينات عبر refresh token
-  async refreshTokens(userId: string, refreshToken: string) {
-    // 1. التحقق من صحة ال refresh token
-    const isValid = await this.refreshTokenService.validate(
-      userId,
-      refreshToken,
+  async refreshTokens(
+    presentedRefreshToken: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
+    // 1) نتحقق من التوقيع ونستخرج payload (sub, jti)
+    let payload: JwtRefreshPayload;
+    try {
+      payload = await this.jwtService.verifyAsync(presentedRefreshToken, {
+        secret: process.env.JWT_SECRET,
+      });
+    } catch (err) {
+      console.log(err);
+      // التوكن غير صالح توقيعياً
+      throw new UnauthorizedException('Invalid refresh token (signature)');
+    }
+
+    const userId = payload.sub;
+    const jti = payload.jti as string | undefined;
+
+    if (!userId || !jti) {
+      // لو مفقود jti => غير مصدق
+      throw new UnauthorizedException('Invalid refresh token payload');
+    }
+
+    // 2) نبحث عن السجل الموجود بالـ jti
+    const stored = await this.refreshTokenService.findByJti(jti);
+
+    if (!stored) {
+      // **حالة خطيرة: التوكن المصادق لكنه غير موجود في DB**
+      // احتمال reuse أو اختراق -> نلغي كل التوكنات للمستخدم (precaution)
+      await this.refreshTokenService.revokedAll(userId).catch(() => {});
+      throw new UnauthorizedException('Refresh token reuse detected');
+    }
+
+    if (stored.revokedAt) {
+      // التوكن قد سبق إبطاله -> احتمال إعادة استخدام -> نلغي الكل
+      await this.refreshTokenService.revokedAll(userId).catch(() => {});
+      throw new UnauthorizedException(
+        'Refresh token was revoked — possible reuse',
+      );
+    }
+
+    // 3) نتحقق من أن التوكن المقدم يتطابق مع الـ hash المخزن
+    const isValid = await bcrypt.compare(
+      presentedRefreshToken,
+      stored.tokenHash,
     );
-    if (!isValid) throw new UnauthorizedException('Invalid refresh token');
+    if (!isValid) {
+      // mismatch -> احتمال سرقة أو تلاعب -> نلغي الكل
+      await this.refreshTokenService.revokedAll(userId).catch(() => {});
+      throw new UnauthorizedException('Invalid refresh token (hash mismatch)');
+    }
 
-    const token = await this.getToken(userId, '');
+    // 4) Rotation: نلغي التوكن الحالي ونصدر توكن جديد مع jti جديد
+    await this.refreshTokenService.revokeByJti(userId, jti); // نضع revokedAt على القديم
 
-    //نلغي كل التوكينات القديمة وننشئ توكن جديد
-    await this.refreshTokenService.revokedAll(userId);
+    // نُنتج توكنات جديدة
+    const {
+      accessToken,
+      refreshToken: newRefresh,
+      jti: newJti,
+    } = await this.generateTokens(userId, '');
 
     const expiresAt = new Date();
-    // صلاحية ال refresh token لمدة 7 أيام
-    expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    // نخزن التوكن الجديد في DB
     await this.refreshTokenService.create(
       userId,
-      token.refreshToken,
+      newRefresh,
       expiresAt,
+      ip,
+      userAgent,
+      newJti,
     );
-    return token;
+
+    // نُرجع التوكنات الجديدة للـ caller ليَضَعها في كوكي/RESP
+    return { accessToken, refreshToken: newRefresh };
   }
+  // // async refreshTokens(userId: string, refreshToken: string) {
+  // //   // 1. التحقق من صحة ال refresh token
+  // //   const isValid = await this.refreshTokenService.validate(
+  // //     userId,
+  // //     refreshToken,
+  // //   );
+  // //   if (!isValid) throw new UnauthorizedException('Invalid refresh token');
+
+  // //   const token = await this.getToken(userId, '');
+
+  // //   //نلغي كل التوكينات القديمة وننشئ توكن جديد
+  // //   await this.refreshTokenService.revokedAll(userId);
+
+  // //   const expiresAt = new Date();
+  // //   // صلاحية ال refresh token لمدة 7 أيام
+  // //   expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
+  // //   await this.refreshTokenService.create(
+  // //     userId,
+  // //     token.refreshToken,
+  // //     expiresAt,
+  // //   );
+  // //   return token;
+  // // }
 
   // تسجيل الخروج من جهاز معين
   async logoutFromDevice(userId: string, refreshToken: string) {
@@ -126,19 +281,24 @@ export class AuthService {
     try {
       const user = await this.userService.createUser(createUserDto);
 
-      const tokens = await this.getToken(user.id, user.email);
+      const { accessToken, refreshToken, jti } = await this.generateTokens(
+        user.id,
+        user.email,
+      );
 
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
       await this.refreshTokenService.create(
         user.id,
-        tokens.refreshToken,
+        refreshToken,
         expiresAt,
         ip,
         userAgent,
+        jti,
       );
       return {
-        ...tokens,
+        accessToken,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
