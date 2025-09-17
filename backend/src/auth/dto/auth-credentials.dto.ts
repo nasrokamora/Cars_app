@@ -20,7 +20,7 @@ export class AuthCredentialsDto {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
     {
       message:
-        'يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل، وحرف صغير واحد على الأقل، ورقم واحد، ورمز خاص واحد.',
+        'Password too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
     },
   )
   password: string; // كلمة المرور (بالنص قبل التشفير)

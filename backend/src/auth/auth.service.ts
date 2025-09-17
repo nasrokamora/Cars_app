@@ -57,7 +57,7 @@ export class AuthService {
         email,
       },
       {
-        secret: process.env.JWT_SECRET,
+        secret: process.env.JWT_REFRESH_SECRET,
         expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
         jwtid: jti,
       },
@@ -65,21 +65,42 @@ export class AuthService {
     return { accessToken, refreshToken, jti };
   }
 
-  // async getToken(userId: string, email: string) {
-  //   const payload = { email, sub: userId };
-  //   const [accessToken, refreshToken] = await Promise.all([
-  //     this.jwtService.signAsync(payload, {
-  //       secret: process.env.JWT_SECRET,
-  //       expiresIn: process.env.JWT_EXPIRES_IN,
-  //     }),
-  //     this.jwtService.signAsync(payload, {
-  //       secret: process.env.JWT_SECRET,
-  //       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
-  //     }),
-  //   ]);
+  // تسجيل مستخدم جديد
+  async signup(createUserDto: CreateUserDto, ip?: string, userAgent?: string) {
+    try {
+      const user = await this.userService.createUser(createUserDto);
 
-  //   return { accessToken, refreshToken };
-  // }
+      const { accessToken, refreshToken, jti } = await this.generateTokens(
+        user.id,
+        user.email,
+      );
+
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+      await this.refreshTokenService.create(
+        user.id,
+        refreshToken,
+        expiresAt,
+        ip,
+        userAgent,
+        jti,
+      );
+      return {
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          username: user.username,
+        },
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      throw new UnauthorizedException(`Error creating user: ${errorMessage}`);
+    }
+  }
 
   // تسجيل الدخول
 
@@ -122,149 +143,94 @@ export class AuthService {
       },
     };
   }
-  // // async login(
-  // //   authCredentialsDto: AuthCredentialsDto,
-  // //   ip?: string,
-  // //   userAgent?: string,
-  // // ) {
-  // //   const user = await this.validateUser(
-  // //     authCredentialsDto.email,
-  // //     authCredentialsDto.password,
-  // //   );
-  // //   if (!user) throw new BadGatewayException('Invalid credentials');
-
-  // //   const { accessToken, refreshToken, jti } = await this.generateTokens(
-  // //     user.id,
-  // //     user.email,
-  // //   );
-
-  // //   const expiresAt = new Date();
-  // //   expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
-
-  // //   await this.refreshTokenService.create(
-  // //     user.id,
-  // //     await refreshToken,
-  // //     expiresAt,
-  // //     ip,
-  // //     userAgent,
-  // //     jti, // تمرير jti إلى خدمة توكن التحديث
-  // //   );
-  // //   return {
-  // //     accessToken,
-  // //     refreshToken,
-  // //     user: {
-  // //       id: user.id,
-  // //       email: user.email,
-  // //       role: user.role,
-  // //       username: user.username,
-  // //     },
-  // //   };
-  // // }
 
   //تحديث التوكينات عبر refresh token
   async refreshTokens(
-    presentedRefreshToken: string,
+    oldRefreshToken: string,
     ip?: string,
     userAgent?: string,
   ) {
     // 1) نتحقق من التوقيع ونستخرج payload (sub, jti)
     let payload: JwtRefreshPayload;
     try {
-      payload = await this.jwtService.verifyAsync(presentedRefreshToken, {
-        secret: process.env.JWT_SECRET,
+      payload = await this.jwtService.verifyAsync(oldRefreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
       });
+      const userId = payload.sub;
+      const jti = payload.jti as string | undefined;
+
+      if (!userId || !jti) {
+        // لو مفقود jti => غير مصدق
+        throw new UnauthorizedException('Invalid refresh token payload');
+      }
+
+      // 2) نبحث عن السجل الموجود بالـ jti
+      const stored = await this.refreshTokenService.findByJti(jti);
+
+      if (!stored) {
+        // **حالة خطيرة: التوكن المصادق لكنه غير موجود في DB**
+        // احتمال reuse أو اختراق -> نلغي كل التوكنات للمستخدم (precaution)
+        await this.refreshTokenService.revokedAll(userId).catch(() => {});
+        throw new UnauthorizedException('Refresh token reuse detected');
+      }
+
+      if (stored.revokedAt) {
+        // التوكن قد سبق إبطاله -> احتمال إعادة استخدام -> نلغي الكل
+        await this.refreshTokenService.revokedAll(userId).catch(() => {});
+        throw new UnauthorizedException(
+          'Refresh token was revoked — possible reuse',
+        );
+      }
+
+      // 3) نتحقق من أن التوكن المقدم يتطابق مع الـ hash المخزن
+      const isValid = await bcrypt.compare(oldRefreshToken, stored.tokenHash);
+      if (!isValid) {
+        // mismatch -> احتمال سرقة أو تلاعب -> نلغي الكل
+        await this.refreshTokenService.revokedAll(userId).catch(() => {});
+        throw new UnauthorizedException(
+          'Invalid refresh token (hash mismatch)',
+        );
+      }
+
+      // 4) Rotation: نلغي التوكن الحالي ونصدر توكن جديد مع jti جديد
+      await this.refreshTokenService.revokeByJti(jti, userId); // نضع revokedAt على القديم
+
+      // نُنتج توكنات جديدة
+      const user = await this.userService.findUserById(userId);
+      if (!user) {
+        // حالة نادرة: المستخدم محذوف مع وجود توكنات سابقة
+        throw new UnauthorizedException('Invalid user (not found)');
+      }
+
+      // نُنتج توكنات جديدة
+      const {
+        accessToken,
+        refreshToken: newRefresh,
+        jti: newJti,
+      } = await this.generateTokens(userId, user.email);
+
+      // صلاحية ال refresh token لمدة 7 أيام
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      // نخزن التوكن الجديد في DB
+      await this.refreshTokenService.create(
+        userId,
+        newRefresh,
+        expiresAt,
+        ip,
+        userAgent,
+        newJti,
+      );
+
+      // نُرجع التوكنات الجديدة للـ caller ليَضَعها في كوكي/RESP
+      return { accessToken, refreshToken: newRefresh };
     } catch (err) {
       console.log(err);
       // التوكن غير صالح توقيعياً
       throw new UnauthorizedException('Invalid refresh token (signature)');
     }
-
-    const userId = payload.sub;
-    const jti = payload.jti as string | undefined;
-
-    if (!userId || !jti) {
-      // لو مفقود jti => غير مصدق
-      throw new UnauthorizedException('Invalid refresh token payload');
-    }
-
-    // 2) نبحث عن السجل الموجود بالـ jti
-    const stored = await this.refreshTokenService.findByJti(jti);
-
-    if (!stored) {
-      // **حالة خطيرة: التوكن المصادق لكنه غير موجود في DB**
-      // احتمال reuse أو اختراق -> نلغي كل التوكنات للمستخدم (precaution)
-      await this.refreshTokenService.revokedAll(userId).catch(() => {});
-      throw new UnauthorizedException('Refresh token reuse detected');
-    }
-
-    if (stored.revokedAt) {
-      // التوكن قد سبق إبطاله -> احتمال إعادة استخدام -> نلغي الكل
-      await this.refreshTokenService.revokedAll(userId).catch(() => {});
-      throw new UnauthorizedException(
-        'Refresh token was revoked — possible reuse',
-      );
-    }
-
-    // 3) نتحقق من أن التوكن المقدم يتطابق مع الـ hash المخزن
-    const isValid = await bcrypt.compare(
-      presentedRefreshToken,
-      stored.tokenHash,
-    );
-    if (!isValid) {
-      // mismatch -> احتمال سرقة أو تلاعب -> نلغي الكل
-      await this.refreshTokenService.revokedAll(userId).catch(() => {});
-      throw new UnauthorizedException('Invalid refresh token (hash mismatch)');
-    }
-
-    // 4) Rotation: نلغي التوكن الحالي ونصدر توكن جديد مع jti جديد
-    await this.refreshTokenService.revokeByJti(userId, jti); // نضع revokedAt على القديم
-
-    // نُنتج توكنات جديدة
-    const {
-      accessToken,
-      refreshToken: newRefresh,
-      jti: newJti,
-    } = await this.generateTokens(userId, '');
-
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    // نخزن التوكن الجديد في DB
-    await this.refreshTokenService.create(
-      userId,
-      newRefresh,
-      expiresAt,
-      ip,
-      userAgent,
-      newJti,
-    );
-
-    // نُرجع التوكنات الجديدة للـ caller ليَضَعها في كوكي/RESP
-    return { accessToken, refreshToken: newRefresh };
   }
-  // // async refreshTokens(userId: string, refreshToken: string) {
-  // //   // 1. التحقق من صحة ال refresh token
-  // //   const isValid = await this.refreshTokenService.validate(
-  // //     userId,
-  // //     refreshToken,
-  // //   );
-  // //   if (!isValid) throw new UnauthorizedException('Invalid refresh token');
-
-  // //   const token = await this.getToken(userId, '');
-
-  // //   //نلغي كل التوكينات القديمة وننشئ توكن جديد
-  // //   await this.refreshTokenService.revokedAll(userId);
-
-  // //   const expiresAt = new Date();
-  // //   // صلاحية ال refresh token لمدة 7 أيام
-  // //   expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
-  // //   await this.refreshTokenService.create(
-  // //     userId,
-  // //     token.refreshToken,
-  // //     expiresAt,
-  // //   );
-  // //   return token;
-  // // }
 
   // تسجيل الخروج من جهاز معين
   async logoutFromDevice(userId: string, refreshToken: string) {
@@ -274,42 +240,5 @@ export class AuthService {
   // تسجيل الخروج من جميع الأجهزة
   async logoutFromAllDevice(userId: string) {
     await this.refreshTokenService.revokedAll(userId);
-  }
-
-  // تسجيل مستخدم جديد
-  async signup(createUserDto: CreateUserDto, ip?: string, userAgent?: string) {
-    try {
-      const user = await this.userService.createUser(createUserDto);
-
-      const { accessToken, refreshToken, jti } = await this.generateTokens(
-        user.id,
-        user.email,
-      );
-
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
-      await this.refreshTokenService.create(
-        user.id,
-        refreshToken,
-        expiresAt,
-        ip,
-        userAgent,
-        jti,
-      );
-      return {
-        accessToken,
-        refreshToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          username: user.username,
-        },
-      };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new UnauthorizedException(`Error creating user: ${errorMessage}`);
-    }
   }
 }

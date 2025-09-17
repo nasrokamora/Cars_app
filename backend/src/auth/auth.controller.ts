@@ -60,13 +60,13 @@ export class AuthController {
 
   private cookieOptionsRefresh() {
     return {
-      httpOnly: true,
+      httpOnly: false,
       secure:
-        process.env.COOKIE_SECURE === 'false' ||
+        process.env.COOKIE_SECURE === 'true' ||
         process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'strict' as const,
-      path: '/auth/refresh',
+      path: '/',
       maxAge:
         this.parseExpiryToMs(process.env.JWT_REFRESH_EXPIRES_IN) ||
         7 * 24 * 60 * 60 * 1000, // 7 days
@@ -92,8 +92,8 @@ export class AuthController {
 
     // تخزين التوكن في كوكيز
     res.cookie('refresh_token', refreshToken, this.cookieOptionsRefresh());
-
-    return { accessToken, user };
+    res.cookie('access_token', accessToken, this.cookieOptionsAccess());
+    return { user };
   }
 
   // -------------------------
@@ -173,7 +173,7 @@ export class AuthController {
         const payload = await this.authService[
           'jwtService'
         ].verifyAsync<JwtRefreshPayload>(presented, {
-          secret: process.env.JWT_SECRET,
+          secret: process.env.JWT_REFRESH_SECRET,
         });
         const jti = payload?.jti as string | undefined;
         if (jti) {

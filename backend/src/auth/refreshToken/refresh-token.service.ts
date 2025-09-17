@@ -78,9 +78,24 @@ export class RefreshTokenService {
   // إبطال توكن واحد (مثلاً لو استخدم جهاز واحد logout)
 
   async revokedById(userId: string, refreshToken: string) {
-    await this.prisma.refreshToken.updateMany({
-      where: { userId, tokenHash: refreshToken, revokedAt: null },
-      data: { revokedAt: new Date() },
+    const token = await this.prisma.refreshToken.findMany({
+      where: { userId, revokedAt: null },
     });
+    for (const t of token) {
+      const isMAtch = await bcrypt.compare(refreshToken, t.tokenHash);
+      if (isMAtch) {
+        await this.prisma.refreshToken.update({
+          where: { id: t.id },
+          data: { revokedAt: new Date() },
+        });
+        break; //break to stop loop
+      }
+    }
   }
+
+  //   await this.prisma.refreshToken.updateMany({
+  //     where: { userId, tokenHash: refreshToken, revokedAt: null },
+  //     data: { revokedAt: new Date() },
+  //   });
+  // }
 }
