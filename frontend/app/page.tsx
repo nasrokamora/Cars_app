@@ -1,29 +1,46 @@
-import Aurora from "@/components/Aurora";
-
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import imageHeroCar from '@/public/all_image_cars/hero_section_model.png'
 
 
 export default function Home() {
   return (
-    <main className=" min-h-screen hero bg-[#e8e8e8] dark:bg-black">
-      <div className="">
-        <Aurora
-          colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
-          blend={0.5}
-          amplitude={1.0}
-          speed={0.5}
-        />
-        <div className="hero-content text-center">
-          <div className="max-w-md">
-            <h1 className="text-5xl font-bold">Hello there</h1>
-            <p className="py-6">
-              Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-              quasi. In deleniti eaque aut repudiandae et a id nisi.
-            </p>
-            <button className="btn btn-primary">Get Started</button>
+    <section className="relative bg-gradient-to-br from-[#0d1b2a] via-[#1b263b] to-[#415a77] text-white overflow-hidden">
+      <div className="container mx-auto px-6 py-20 flex flex-col lg:flex-row items-center">
+        
+        {/* Left Content */}
+        <div className="flex-1 text-center lg:text-left">
+          <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-6">
+            Find your <span className="text-blue-400">dream car</span> with ease 🚗
+          </h1>
+          <p className="text-lg text-gray-300 mb-8 max-w-xl">
+            Browse new & used cars, compare models, and make smarter choices.  
+            Start your journey today!
+          </p>
+
+          <div className="flex gap-4 justify-center lg:justify-start">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg">
+              Search Cars
+            </Button>
+            <Button variant="outline" className="border-white text-white px-6 py-3 rounded-lg">
+              Compare Now
+            </Button>
           </div>
         </div>
+
+        {/* Right Image */}
+        <div className="flex-1 mt-10 lg:mt-0 lg:ml-10">
+          <Image
+            src={imageHeroCar}
+            alt="Sports Car"
+            width={600}
+            height={400}
+            className="drop-shadow-2xl"
+            priority
+          />
+        </div>
       </div>
-    </main>
+    </section>
 
 
   );
