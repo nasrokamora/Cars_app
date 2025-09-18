@@ -17,7 +17,7 @@ import ToggleMenu from "./ToggleMenu/ToggleMenu";
 
 export default function NavBar() {
     return (
-        <nav className="navbar  gap-1 justify-around items-center border-b border-gray-400  ">
+        <nav className="navbar relative z-50  gap-1 justify-around items-center border-b border-gray-400  ">
             <div className="" >
 
                 {/* icon link  */}

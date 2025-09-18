@@ -5,7 +5,7 @@ import imageHeroCar from '@/public/all_image_cars/hero_section_model.png'
 
 export default function Home() {
   return (
-    <section className="relative bg-gradient-to-br from-[#0d1b2a] via-[#1b263b] to-[#415a77] text-white overflow-hidden">
+    <section className="relative bg-gradient-to-br from-[#0d1b2a] via-[#1b263b] to-[#415a77] z-50 text-white overflow-hidden">
       <div className="container mx-auto px-6 py-20 flex flex-col lg:flex-row items-center">
         
         {/* Left Content */}
