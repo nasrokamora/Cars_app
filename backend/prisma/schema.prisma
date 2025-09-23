@@ -32,6 +32,7 @@ model RefreshToken {
   id         String    @id @default(uuid())
   tokenHash  String
   jti        String    @unique // <<-- jti مميز لكل توكن (UUID)
+  jwtId String? @unique
   userId     String
   User       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())
@@ -40,6 +41,10 @@ model RefreshToken {
   ip         String? // اختياري: تخزين IP
   userAgent  String? // اختياري: تخزين نوع الجهاز/المتصفح
   replacedBy String?
+
+  @@index([userId])
+  @@index([jti])
+  @@index([jwtId])
 }
 
 enum Role {
