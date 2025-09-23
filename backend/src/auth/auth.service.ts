@@ -6,7 +6,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
-
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 import { RefreshTokenService } from './refreshToken/refresh-token.service';
@@ -39,7 +38,7 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string, email?: string) {
-    const jti = randomUUID(); // إنشاء معرف فريد لكل توكن
+    const jwtId = randomUUID(); // إنشاء معرف فريد لكل توكن
     const accessToken = await this.jwtService.signAsync(
       {
         sub: userId,
@@ -59,10 +58,10 @@ export class AuthService {
       {
         secret: process.env.JWT_REFRESH_SECRET,
         expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-        jwtid: jti,
+        jwtid: jwtId,
       },
     );
-    return { accessToken, refreshToken, jti };
+    return { accessToken, refreshToken, jwtId };
   }
 
   // تسجيل مستخدم جديد
@@ -70,21 +69,21 @@ export class AuthService {
     try {
       const user = await this.userService.createUser(createUserDto);
 
-      const { accessToken, refreshToken, jti } = await this.generateTokens(
+      const { accessToken, refreshToken, jwtId } = await this.generateTokens(
         user.id,
         user.email,
       );
 
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
-      await this.refreshTokenService.create(
-        user.id,
+      await this.refreshTokenService.create({
+        userId: user.id,
         refreshToken,
-        expiresAt,
+        jwtId,
         ip,
         userAgent,
-        jti,
-      );
+        expiresAt,
+      });
       return {
         accessToken,
         refreshToken,
@@ -109,13 +108,15 @@ export class AuthService {
     ip?: string,
     userAgent?: string,
   ) {
+    // نتحقق من صحة بيانات تسجيل الدخول
     const user = await this.validateUser(
       authCredentialsDto.email,
       authCredentialsDto.password,
     );
+
     if (!user) throw new BadGatewayException('Invalid credentials');
 
-    const { accessToken, refreshToken, jti } = await this.generateTokens(
+    const { accessToken, refreshToken, jwtId } = await this.generateTokens(
       user.id,
       user.email,
     );
@@ -123,14 +124,14 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // صلاحية ال refresh token لمدة 7 أيام
 
-    await this.refreshTokenService.create(
-      user.id,
+    await this.refreshTokenService.create({
+      userId: user.id,
       refreshToken,
       expiresAt,
       ip,
       userAgent,
-      jti, // تمرير jti إلى خدمة توكن التحديث
-    );
+      jwtId,
+    });
 
     return {
       accessToken,
@@ -145,27 +146,23 @@ export class AuthService {
   }
 
   //تحديث التوكينات عبر refresh token
-  async refreshTokens(
-    oldRefreshToken: string,
-    ip?: string,
-    userAgent?: string,
-  ) {
+  async refreshTokens(presentedToken: string, ip?: string, userAgent?: string) {
     // 1) نتحقق من التوقيع ونستخرج payload (sub, jti)
     let payload: JwtRefreshPayload;
     try {
-      payload = await this.jwtService.verifyAsync(oldRefreshToken, {
+      payload = await this.jwtService.verifyAsync(presentedToken, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
       const userId = payload.sub;
-      const jti = payload.jti as string | undefined;
+      const jwtId = payload.jti as string | undefined;
 
-      if (!userId || !jti) {
+      if (!userId || !jwtId) {
         // لو مفقود jti => غير مصدق
         throw new UnauthorizedException('Invalid refresh token payload');
       }
 
       // 2) نبحث عن السجل الموجود بالـ jti
-      const stored = await this.refreshTokenService.findByJti(jti);
+      const stored = await this.refreshTokenService.findByJwtId(jwtId);
 
       if (!stored) {
         // **حالة خطيرة: التوكن المصادق لكنه غير موجود في DB**
@@ -183,7 +180,10 @@ export class AuthService {
       }
 
       // 3) نتحقق من أن التوكن المقدم يتطابق مع الـ hash المخزن
-      const isValid = await bcrypt.compare(oldRefreshToken, stored.tokenHash);
+      const isValid = await this.refreshTokenService.validateByPresentedToken(
+        userId,
+        presentedToken,
+      );
       if (!isValid) {
         // mismatch -> احتمال سرقة أو تلاعب -> نلغي الكل
         await this.refreshTokenService.revokedAll(userId).catch(() => {});
@@ -193,7 +193,7 @@ export class AuthService {
       }
 
       // 4) Rotation: نلغي التوكن الحالي ونصدر توكن جديد مع jti جديد
-      await this.refreshTokenService.revokeByJti(jti, userId); // نضع revokedAt على القديم
+      await this.refreshTokenService.revokedByJwtId(jwtId, userId); // نضع revokedAt على القديم
 
       // نُنتج توكنات جديدة
       const user = await this.userService.findUserById(userId);
@@ -206,7 +206,7 @@ export class AuthService {
       const {
         accessToken,
         refreshToken: newRefresh,
-        jti: newJti,
+        jwtId: newJwtId,
       } = await this.generateTokens(userId, user.email);
 
       // صلاحية ال refresh token لمدة 7 أيام
@@ -214,14 +214,14 @@ export class AuthService {
       expiresAt.setDate(expiresAt.getDate() + 7);
 
       // نخزن التوكن الجديد في DB
-      await this.refreshTokenService.create(
+      await this.refreshTokenService.create({
         userId,
-        newRefresh,
+        refreshToken: newRefresh,
         expiresAt,
         ip,
         userAgent,
-        newJti,
-      );
+        jwtId: newJwtId,
+      });
 
       // نُرجع التوكنات الجديدة للـ caller ليَضَعها في كوكي/RESP
       return { accessToken, refreshToken: newRefresh };
@@ -233,8 +233,11 @@ export class AuthService {
   }
 
   // تسجيل الخروج من جهاز معين
-  async logoutFromDevice(userId: string, refreshToken: string) {
-    await this.refreshTokenService.revokedById(userId, refreshToken);
+  async logoutFromDevice(userId: string, presentedToken: string) {
+    await this.refreshTokenService.revokeByPresentedToken(
+      userId,
+      presentedToken,
+    );
   }
 
   // تسجيل الخروج من جميع الأجهزة

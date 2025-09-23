@@ -5,8 +5,6 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class RefreshTokenService {
-  private readonly SALT_ROUNDS = 10;
-
   constructor(private readonly prisma: PrismaService) {}
 
   private hmacFingerprint(token: string) {
