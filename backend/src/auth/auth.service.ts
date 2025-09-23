@@ -244,4 +244,8 @@ export class AuthService {
   async logoutFromAllDevice(userId: string) {
     await this.refreshTokenService.revokedAll(userId);
   }
+
+  protected() {
+    return 'You have accessed a protected route';
+  }
 }

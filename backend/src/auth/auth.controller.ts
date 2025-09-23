@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   Res,
@@ -99,7 +100,7 @@ export class AuthController {
   // -------------------------
   // refresh token
   // -------------------------
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('/refresh')
   async refresh(
     @Req() req: Request,
@@ -200,5 +201,11 @@ export class AuthController {
     res.clearCookie('access_token', this.cookieOptionsAccess());
     res.clearCookie('refresh_token', this.cookieOptionsRefresh());
     return { message: 'Logged out from all devices successfully' };
+  }
+
+  @Get('protected')
+  @UseGuards(JwtAuthGuard)
+  protected() {
+    return this.authService.protected();
   }
 }
