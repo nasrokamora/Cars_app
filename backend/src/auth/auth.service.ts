@@ -154,10 +154,10 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET,
       });
       const userId = payload.sub;
-      const jwtId = payload.jti as string | undefined;
+      const jwtId = payload.jwtId as string | undefined;
 
       if (!userId || !jwtId) {
-        // لو مفقود jti => غير مصدق
+        // لو مفقود jwtId => غير مصدق
         throw new UnauthorizedException('Invalid refresh token payload');
       }
 
@@ -232,7 +232,7 @@ export class AuthService {
     }
   }
 
-  // تسجيل الخروج من جهاز معين
+  // تسجيل الخروج من جهاز معين logout from device
   async logoutFromDevice(userId: string, presentedToken: string) {
     await this.refreshTokenService.revokeByPresentedToken(
       userId,
@@ -240,7 +240,7 @@ export class AuthService {
     );
   }
 
-  // تسجيل الخروج من جميع الأجهزة
+  // تسجيل الخروج من جميع الأجهزة logout from all devices
   async logoutFromAllDevice(userId: string) {
     await this.refreshTokenService.revokedAll(userId);
   }

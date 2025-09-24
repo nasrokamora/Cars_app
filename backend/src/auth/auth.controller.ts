@@ -67,7 +67,7 @@ export class AuthController {
         process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'strict' as const,
-      path: '/',
+      path: '/auth/refresh',
       maxAge:
         this.parseExpiryToMs(process.env.JWT_REFRESH_EXPIRES_IN) ||
         7 * 24 * 60 * 60 * 1000, // 7 days
@@ -176,9 +176,9 @@ export class AuthController {
         ].verifyAsync<JwtRefreshPayload>(presented, {
           secret: process.env.JWT_REFRESH_SECRET,
         });
-        const jti = payload?.jti as string | undefined;
-        if (jti) {
-          await this.authService.logoutFromDevice(user.id, jti);
+        const jwtId = payload?.jwtId as string | undefined;
+        if (jwtId) {
+          await this.authService.logoutFromDevice(user.id, jwtId);
         }
       } catch (err) {
         console.log(err);

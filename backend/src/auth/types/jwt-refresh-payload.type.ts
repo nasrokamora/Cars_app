@@ -22,5 +22,5 @@ export type JwtRefreshPayload = {
   /**
    * The unique identifier for the token itself.
    */
-  jti: string;
+  jwtId: string;
 };

@@ -8,7 +8,7 @@ export class RefreshTokenService {
   constructor(private readonly prisma: PrismaService) {}
 
   private hmacFingerprint(token: string) {
-    const secret = process.env.HMAC_SECRET || 'default';
+    const secret = process.env.HMAC_SECRET;
     if (!secret) throw new Error('HMAC_SECRET is not defined');
     return crypto.createHmac('sha256', secret).update(token).digest('hex');
   }
