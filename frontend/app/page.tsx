@@ -3,16 +3,12 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import imageHeroCar from '@/public/all_image_cars/hero_section_model.png'
-import { SearchInput } from "./components/InputSearchButton/SearchInput";
+// import { SearchInput } from "./components/InputSearchButton/SearchInput";
 // import CarouselTest from "./components/InputSearchButton/InputSearchButton";
 // import ImageAnimateHome from "./components/animation/ImageAnimateHome";
 
 
 export default function Home() {
-  const handleSearchQuery = (query: string) => {
-    console.log(query);
-  }
-
 
   return (
     <main className="">
@@ -22,7 +18,7 @@ export default function Home() {
           <h1 className=" text-xl font-bold md:text-2xl lg:text-3xl xl:text-4xl ">
             Search for your dream car
           </h1>
-          <SearchInput placeholder="Search for Car, Truck, Motorcycle" onSearch={handleSearchQuery}  />
+          {/* <SearchInput placeholder="Search for Car, Truck, Motorcycle"  /> */}
         </div>
 
       </div>
