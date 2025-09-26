@@ -44,7 +44,7 @@ export default function CarouselTest() {
             opts={{
                 align: "start",
             }}
-            className="w-full max-w-sm"
+            className="w-full max-w-sm bg-gray-950 text-white"
         >
             <CarouselContent>
                 {TestLIst.map((_item) => (

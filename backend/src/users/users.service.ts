@@ -11,7 +11,7 @@ import { User } from '@prisma/client';
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {} // نحقن PrismaService
-  // 🕵️‍♂️ **البحث عن مستخدم بواسطة البريد الإلكتروني**
+  //  **البحث عن مستخدم بواسطة البريد الإلكتروني**
   async findUserByEmail(email: string): Promise<User | null> {
     return await this.prisma.user.findUnique({
       where: { email }, // نبحث عن مستخدم بنفس البريد

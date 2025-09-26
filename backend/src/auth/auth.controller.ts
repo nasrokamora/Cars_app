@@ -20,6 +20,7 @@ import { Request, Response } from 'express';
 import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 // import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -131,7 +132,7 @@ export class AuthController {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
-
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
     @Body() authCredentialsDto: AuthCredentialsDto,
