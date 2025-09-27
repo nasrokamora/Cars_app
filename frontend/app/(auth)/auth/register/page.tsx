@@ -1,30 +1,6 @@
+import { SignUpAction } from "@/app/action/actions";
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-async function handlerSignUp(formData: FormData) {
-    "use server"
-    const username = formData.get('username') as string
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-
-    try {
-
-        const res = await fetch('/api/auth/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password })
-        })
-
-        const data = await res.json()
-
-        return data
-    } catch (error) {
-        console.error(error as Error)
-    }
-}
-
-
-
 
 export default function RegisterPage() {
     return (
@@ -32,10 +8,10 @@ export default function RegisterPage() {
             <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow p-6">
                 <h1 className="text-2xl font-semibold mb-4 text-center">Register</h1>
                 {/* 🔑 هنا تضيف الفورم */}
-                <form className="space-y-4" action={handlerSignUp}>
+                <form className="space-y-4" action={SignUpAction}>
                     <Label htmlFor="username">Username</Label>
                     <Input
-                        type="text"
+                        type="username"
                         placeholder="Username"
                         className="w-full p-2 border rounded-lg dark:bg-gray-700"
                     />
