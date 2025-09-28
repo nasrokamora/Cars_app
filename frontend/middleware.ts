@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 
 export function middleware(req: NextRequest) {
-    const accessToken = req.cookies.get('access_Token')?.value;
+    const accessToken = req.cookies.get('access_token')?.value;
 
     if(!accessToken && req.nextUrl.pathname.startsWith('/dashboard')) {
         return NextResponse.redirect(new URL("/auth/login", req.url));

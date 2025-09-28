@@ -8,16 +8,16 @@ export async function SignUpAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const response = await fetch("/api/auth/signup", {
+  const response = await fetch("http://localhost:3000/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password }),
     credentials: "include",
   });
+  const data = await response.json();
   if (!response.ok) {
     throw new Error("Failed to sign up");
   }
-  const data = await response.json();
   if (data.error) {
     throw new Error(data.error);
   }
@@ -30,26 +30,26 @@ export async function LoginAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch("http://localhost:3000/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
+  const data = await response.json();
   if (!response.ok) {
     throw new Error("Failed to login");
   }
-  const data = await response.json();
   if (data.error) {
     throw new Error(data.error);
   }
-  return data;
-  redirect("/login");
+
+  redirect("/dashboard");
 
 } // SignInAction
 
 export async function LogoutAction() {
   "use server";
-  const response = await fetch("/api/auth/logout", {
+  const response = await fetch("http://localhost:3000/api/auth/logout", {
     method: "POST",
     credentials: "include",
   });

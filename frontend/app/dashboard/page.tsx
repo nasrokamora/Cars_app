@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, LogOut } from "lucide-react";
+import { Label } from "@/components/ui/label"
 
 type Car = {
     id: string;
@@ -32,7 +33,7 @@ export default function DashboardPage() {
             setError(null);
             try {
                 // ⚠️ تأكد أن NEXT_PUBLIC_NEST_API_URL مُعرّف في env (مثلاً https://api.example.com)
-                const res = await fetch(`${process.env.NEXT_PUBLIC_NEST_API_URL}/cars/my`, {
+                const res = await fetch(`${process.env.NEST_API_URL}/cars/my`, {
                     method: "GET",
                     credentials: "include", // مهم: يرسل الكوكيز (access_token)
                     headers: {
@@ -68,7 +69,7 @@ return () => {
 
 async function handleLogout() {
     try {
-        await fetch("/api/auth/logout", {
+        await fetch("http://localhost:3000/api/auth/logout", {
             method: "POST",
             credentials: "include", // يمرر الكوكيز عشان NestJS يحذفها
         });
@@ -100,6 +101,7 @@ return (
             </div>
 
             <div className="flex items-center gap-3">
+                <Label htmlFor="search">بحث</Label>
                 <Input
                     placeholder="ابحث في سياراتك..."
                     value={query}

@@ -14,18 +14,21 @@ export default function RegisterPage() {
                         type="username"
                         placeholder="Username"
                         className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                        name="username"
                     />
                     <Label htmlFor="email">Email</Label>
                     <Input
                         type="email"
                         placeholder="Email"
                         className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                        name="email"
                     />
                     <Label htmlFor="password">Password</Label>
                     <Input
                         type="password"
                         placeholder="Password"
                         className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                        name="password"
                     />
                     <button
                         type="submit"
