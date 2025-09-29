@@ -53,7 +53,7 @@ export class AuthController {
         process.env.COOKIE_SECURE === 'true' ||
         process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
-      sameSite: 'strict' as const,
+      sameSite: 'none' as const,
       path: '/',
       maxAge:
         this.parseExpiryToMs(process.env.JWT_EXPIRES_IN) || 15 * 60 * 1000, // 15 minutes
@@ -62,7 +62,7 @@ export class AuthController {
 
   private cookieOptionsRefresh() {
     return {
-      httpOnly: false,
+      httpOnly: true,
       secure:
         process.env.COOKIE_SECURE === 'true' ||
         process.env.NODE_ENV === 'production',

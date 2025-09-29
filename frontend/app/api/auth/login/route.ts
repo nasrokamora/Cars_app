@@ -1,3 +1,4 @@
+"use server"
 import { NextResponse } from "next/server";
 
 
@@ -11,12 +12,12 @@ export async function POST(request: Request) {
         credentials: "include",
     })
 
-    const setCookie = res.headers.get("set-cookie");
     const data = await res.json();
     const response = NextResponse.json(data, {status: res.status});
+    const setCookie = response.cookies.get("set-cookie");
     if(setCookie) {
-        response.headers.set("set-cookie", setCookie);
+        response.headers.set("set-cookie", setCookie as unknown as string);
     }
 
-    return response;
+    return res;
 }

@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -10,9 +9,12 @@ export async function POST(request: Request) {
     body: JSON.stringify(body),
     credentials: "include",
   });
-  const data  = await res.json();
-  if(!res.ok) {
-    return NextResponse.json({message: data.message}, {status: res.status})
+  const data = await res.json();
+  const response = NextResponse.json(data, { status: res.status });
+  const setCookie = response.cookies.get("set-cookie");
+  if (setCookie) {
+    response.headers.set("set-cookie", setCookie as unknown as string);
   }
-  return NextResponse.json({data}, {status: res.status})
-  }
+  return response;
+  // return NextResponse.json({data}, {status: res.status})
+}

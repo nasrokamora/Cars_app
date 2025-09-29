@@ -9,18 +9,20 @@ export class BrandService {
 
   async findAllBrands(): Promise<Brand[]> {
     return await this.prisma.brand.findMany({
-      include: {
-        cars: false, // Include related cars in the response
-      },
+        select:{
+          id: true,
+          name: true
+        }
     });
   }
 
   async findOneBrand(id: string): Promise<Brand | null> {
     const brand = await this.prisma.brand.findUnique({
       where: { id },
-      include: {
-        cars: true, // Include related cars in the response
-      },
+      select: {
+        id: true,
+        name: true,
+      }
     });
     if (!brand) {
       throw new NotFoundException('Brand not found');
