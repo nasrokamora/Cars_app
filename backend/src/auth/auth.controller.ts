@@ -67,7 +67,7 @@ export class AuthController {
         process.env.COOKIE_SECURE === 'true' ||
         process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
-      sameSite: 'strict' as const,
+      sameSite: 'none' as const,
       path: '/auth/refresh',
       maxAge:
         this.parseExpiryToMs(process.env.JWT_REFRESH_EXPIRES_IN) ||

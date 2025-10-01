@@ -15,14 +15,43 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link";
 import Image from "next/image";
 import futuristicCar from '@/public/all_image_cars/carRental.png'
-import { LoginAction } from "@/app/action/actions";
+import { redirect } from "next/navigation";
+// import { LoginAction } from "@/app/action/actions";
+
+
+async function LoginAction(formData: FormData) {
+  "use server";
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  const response = await fetch("http://localhost:3000/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error("Failed to login");
+  }
+  console.log(data);
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  redirect("/dashboard");
+
+} // SignInAction
+
+
+
+
 export default function LoginPage() {
     return (
         <form action={LoginAction}>
             <div className=" flex justify-center items-center h-screen relative">
                 <div className="w-full">
 
-                    <Image src={futuristicCar} fill alt="futuristic_car" className="object-cover blur-md " placeholder="blur" priority />
+                    <Image src={futuristicCar} fill alt="futuristic_car" className="object-cover blur-md  " placeholder="blur" priority />
                 </div>
                 <Card className="w-full max-w-sm text-3xl bg-gradient-to-br from-blue-500 to-sky-400/30 glass backdrop-blur absolute shadow-3xl shadow-sky-400 border-[#cd090a] border  ">
                     <CardHeader>

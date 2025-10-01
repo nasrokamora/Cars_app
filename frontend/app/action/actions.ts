@@ -1,5 +1,6 @@
 // import { cookies } from "next/headers";
 
+
 import { redirect } from "next/navigation";
 
 export async function SignUpAction(formData: FormData) {
@@ -8,11 +9,12 @@ export async function SignUpAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
+
+
   const response = await fetch("http://localhost:3000/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password }),
-    credentials: "include",
   });
   const data = await response.json();
   if (!response.ok) {
@@ -34,12 +36,12 @@ export async function LoginAction(formData: FormData) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
-    credentials: "include",
   });
   const data = await response.json();
   if (!response.ok) {
     throw new Error("Failed to login");
   }
+  console.log(data);
   if (data.error) {
     throw new Error(data.error);
   }

@@ -56,7 +56,7 @@ export default function NavBar() {
             </div>
 
             {/* dark mode toggle */}
-            <div className=" flex justify-center items-center gap-2 ">
+            <div className=" flex justify-center items-center gap-2  ">
                 <div className="mr-2">
                     {/* md => lg */}
                     <DropdownMenuLinks />

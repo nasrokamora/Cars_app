@@ -12,6 +12,7 @@ import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
 
 interface SearchInputProps {
   placeholder?: string
@@ -85,7 +86,8 @@ export function SearchInput({
             isFocused && "text-foreground",
           )}
         />
-
+        
+        <Label className="sr-only">Search</Label>
         <Input
           type="text"
           placeholder={placeholder}
