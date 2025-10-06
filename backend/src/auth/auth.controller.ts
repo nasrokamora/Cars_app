@@ -159,7 +159,7 @@ export class AuthController {
       this.cookieOptionsRefresh(),
     );
 
-    return { user };
+    return user;
   }
 
   @Post('logout')

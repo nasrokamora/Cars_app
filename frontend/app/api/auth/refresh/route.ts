@@ -5,9 +5,9 @@ export async function POST() {
     method: "POST",
     credentials: "include", // include cookies in the request
   });
-  const setCookie = res.headers.get("set-cookie");
   const data = await res.json();
   const response = NextResponse.json(data, { status: res.status });
+  const setCookie = res.headers.get("set-cookie");
   if (setCookie) {
     response.headers.set("set-cookie", setCookie);
   }

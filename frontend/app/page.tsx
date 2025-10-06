@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import imageHeroCar from '@/public/all_image_cars/hero_section_model.png'
 import { SearchInput } from "./components/InputSearchButton/SearchInput";
+import HomeCarousel from "./components/Home/HomeCarousel";
 // import { SearchInput } from "./components/InputSearchButton/SearchInput";
 // import CarouselTest from "./components/InputSearchButton/InputSearchButton";
 // import ImageAnimateHome from "./components/animation/ImageAnimateHome";
@@ -13,16 +14,7 @@ export default function Home() {
 
   return (
     <main className="">
-      {/* search bar */}
-      <div className="space-y-6 m-4">
-        <div className=" space-y-4">
-          <h1 className=" text-xl font-bold md:text-2xl lg:text-3xl xl:text-4xl ">
-            Search for your dream car
-          </h1>
-          <SearchInput placeholder="Search for Car, Truck, Motorcycle"  />
-        </div>
 
-      </div>
       <div className="relative bg-gradient-to-br from-[#0d1b2a] via-[#1b263b] to-[#415a77] text-white overflow-hidden -z-0 h-auto">
         <div className="container mx-auto px-6 py-20 flex flex-col lg:flex-row items-center">
 
@@ -60,8 +52,19 @@ export default function Home() {
 
         </div>
       </div>
+            {/* search bar */}
+      <div className="space-y-6 m-4">
+        <div className=" space-y-4">
+          <h1 className=" text-xl font-bold md:text-2xl lg:text-3xl xl:text-4xl ">
+            Search for your dream car
+          </h1>
+          <SearchInput placeholder="Search for Car, Truck, Motorcycle"  />
+        </div>
+
+      </div>
       <div className="mt-8 flex justify-center items-center">
         {/* <CarouselTest /> */}
+        <HomeCarousel/>
       </div>
 
     </main>

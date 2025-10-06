@@ -10,12 +10,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+// import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link";
 import Image from "next/image";
 import futuristicCar from '@/public/all_image_cars/carRental.png'
 import { redirect } from "next/navigation";
+
 // import { LoginAction } from "@/app/action/actions";
 
 
@@ -30,9 +31,10 @@ async function LoginAction(formData: FormData) {
     body: JSON.stringify({ email, password }),
   });
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error("Failed to login");
-  }
+if (!response.ok ) {
+    throw new Error('Failed to login');
+}
+
   console.log(data);
   if (data.error) {
     throw new Error(data.error);
@@ -71,7 +73,7 @@ export default function LoginPage() {
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>
-                                <Input
+                                <input
                                     id="email"
                                     type="email"
                                     placeholder="m@example.com"
@@ -90,7 +92,7 @@ export default function LoginPage() {
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input id="password" type="password" required name="password" />
+                                <input id="password" type="password" required name="password" />
                             </div>
                         </div>
                     </CardContent>
