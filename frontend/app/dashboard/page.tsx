@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import LogoutButton from "../(auth)/auth/logout/Logout"
 
 export default function DashboardHeader() {
   return (
@@ -33,7 +34,9 @@ export default function DashboardHeader() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Billing</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">
+              <LogoutButton />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -49,9 +50,9 @@ export class AuthController {
   private cookieOptionsAccess() {
     return {
       httpOnly: true,
-      secure:
-        process.env.COOKIE_SECURE === 'true' ||
-        process.env.NODE_ENV === 'production',
+      secure: false,
+      // // process.env.COOKIE_SECURE === 'true' ||
+      // // process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'none' as const,
       path: '/',
@@ -63,9 +64,9 @@ export class AuthController {
   private cookieOptionsRefresh() {
     return {
       httpOnly: true,
-      secure:
-        process.env.COOKIE_SECURE === 'true' ||
-        process.env.NODE_ENV === 'production',
+      secure: false,
+      // // process.env.COOKIE_SECURE === 'true' ||
+      // // process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'none' as const,
       path: '/auth/refresh',
@@ -127,13 +128,13 @@ export class AuthController {
       return { accessToken };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException('Invalid refresh token');
+        throw new BadRequestException('Invalid refresh token');
       }
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
   @UseGuards(LocalAuthGuard)
-  @Post('login')
+  @Post('/login')
   async login(
     @Body() authCredentialsDto: AuthCredentialsDto,
     @Req() req: Request,
@@ -159,11 +160,11 @@ export class AuthController {
       this.cookieOptionsRefresh(),
     );
 
-    return user;
+    return { user };
   }
 
-  @Post('logout')
   @UseGuards(JwtAuthGuard)
+  @Post('/logout')
   async logout(
     @User() user: AuthUser,
     @Req() req: Request,
@@ -187,6 +188,7 @@ export class AuthController {
     }
     res.clearCookie('access_token', this.cookieOptionsAccess());
     res.clearCookie('refresh_token', this.cookieOptionsRefresh());
+    console.log('loged out successfully');
     return { message: 'Logged out successfully' };
   }
 

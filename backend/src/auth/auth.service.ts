@@ -1,8 +1,4 @@
-import {
-  BadGatewayException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
@@ -114,7 +110,7 @@ export class AuthService {
       authCredentialsDto.password,
     );
 
-    if (!user) throw new BadGatewayException('Invalid credentials');
+    if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const { accessToken, refreshToken, jwtId } = await this.generateTokens(
       user.id,

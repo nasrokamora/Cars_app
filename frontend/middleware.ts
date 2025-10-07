@@ -4,29 +4,46 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("access_token");
+  const refreshToken = req.cookies.get("refresh_token");
 
-  const protectedRoutes = ["/dashboard","/profile"]
-  const pathname = req.nextUrl.pathname;
-
-  if(protectedRoutes.some((route)=> pathname.startsWith(route))){
-    if(!accessToken){
-      const refreshResponse = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/refresh`, {
-        method: "POST",
-        credentials: "include",
-      }) 
-      if(!refreshResponse){
-        return NextResponse.redirect(new URL("/login", req.url));
+  if (!accessToken && !refreshToken) {
+    try {
+      const refreshTokenResponse = await fetch(
+        `${process.env.NEXT_NEST_API_URL}/auth/refresh`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      if (!refreshTokenResponse.ok) {
+        return NextResponse.redirect(new URL("/auth/login", req.url));
+      } else {
+        return NextResponse.next();
       }
+        } catch (error) {
+        if (error instanceof Error) {
+          throw new Error('Invalid refresh token');
+        }
+        throw new Error('Invalid refresh token');
+        }
     }
-
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+    // const refreshTokenResponse = await fetch(
+    //   `${process.env.NEXT_NEST_API_URL}/auth/refresh`,
+    //   {
+    //     method: "POST",
+    //     credentials: "include",
+    //   }
+    // );
+    // if (!refreshTokenResponse.ok) {
+    //   return NextResponse.redirect(new URL("/auth/login", req.url));
+    // } else {
+    //   return NextResponse.next();
+    // }
   }
 
-  // if (!accessToken && req.nextUrl.pathname.startsWith("/dashboard")) {
-  //   return NextResponse.redirect(new URL("/login", req.url));
-  // }
-  return NextResponse.next();
+  // return NextResponse.next();
 
-}
 
 export const config = {
   matcher: ["/dashboard/:path*"],

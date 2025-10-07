@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link";
 import Image from "next/image";
 import futuristicCar from '@/public/all_image_cars/carRental.png'
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 // import { LoginAction } from "@/app/action/actions";
 
@@ -29,6 +29,7 @@ async function LoginAction(formData: FormData) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
+    credentials: "include"
   });
   const data = await response.json();
 if (!response.ok ) {
@@ -40,7 +41,6 @@ if (!response.ok ) {
     throw new Error(data.error);
   }
 
-  redirect("/dashboard");
 
 } // SignInAction
 

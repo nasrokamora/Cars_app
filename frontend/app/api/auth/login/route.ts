@@ -12,11 +12,11 @@ export async function POST(request: Request) {
         credentials: "include",
     })
 
+    const setCookie = res.headers.get("set-cookie");
     const data = await res.json();
     const response =  NextResponse.json(data, {status: res.status});
-    const setCookie = res.headers.get("set-cookie");
     if(setCookie) {
-        response.headers.append("set-cookie", setCookie);
+        response.headers.set("set-cookie", setCookie);
     }
 
     return response;
