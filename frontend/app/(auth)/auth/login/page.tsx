@@ -15,38 +15,36 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link";
 import Image from "next/image";
 import futuristicCar from '@/public/all_image_cars/carRental.png'
-// import { redirect } from "next/navigation";
+import { LoginAction } from "@/app/api/auth/login/action";
 
-// import { LoginAction } from "@/app/action/actions";
+// // import { redirect } from "next/navigation";
 
-
-async function LoginAction(formData: FormData) {
-  "use server";
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  const response = await fetch("http://localhost:3000/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-    credentials: "include"
-  });
-  const data = await response.json();
-if (!response.ok ) {
-    throw new Error('Failed to login');
-}
-
-  console.log(data);
-  if (data.error) {
-    throw new Error(data.error);
-  }
+// // import { LoginAction } from "@/app/action/actions";
 
 
-} // SignInAction
+// // async function LoginAction(formData: FormData) {
+// //   "use server";
+// //   const email = formData.get("email") as string;
+// //   const password = formData.get("password") as string;
+
+// //   const response = await fetch("http://localhost:3000/api/auth/login", {
+// //     method: "POST",
+// //     headers: { "Content-Type": "application/json" },
+// //     body: JSON.stringify({ email, password }),
+// //     credentials: "include"
+// //   });
+// //   const data = await response.json();
+// // if (!response.ok ) {
+// //     throw new Error('Failed to login');
+// // }
+
+// //   console.log(data);
+// //   if (data.error) {
+// //     throw new Error(data.error);
+// //   }
 
 
-
-
+// // } // SignInAction
 export default function LoginPage() {
     return (
         <form action={LoginAction}>

@@ -5,11 +5,10 @@ export async function POST() {
     method: "POST",
     credentials: "include", // include cookies in the request
   });
-  const data = await res.json();
-  const response = NextResponse.json(data, { status: res.status });
+
   const setCookie = res.headers.get("set-cookie");
-  if (setCookie) {
-    response.headers.set("set-cookie", setCookie);
-  }
+  const response = NextResponse.json(await res.json(), { status: res.status });
+  if (setCookie) response.headers.set("set-cookie", setCookie);
+  
   return response;
 }
