@@ -14,34 +14,10 @@ import {
 import { Label } from "@/components/ui/label"
 import Link from "next/link";
 import Image from "next/image";
-import futuristicCar from '@/public/all_image_cars/carRental.png'
+// import futuristicCar from '@/public/all_image_cars/carRental.png'
 import { LoginAction } from "@/app/api/auth/login/action";
+import loginBg from '@/public/all_image_cars/bg_carhub.webp'
 
-// // import { redirect } from "next/navigation";
-
-// // import { LoginAction } from "@/app/action/actions";
-
-
-// // async function LoginAction(formData: FormData) {
-// //   "use server";
-// //   const email = formData.get("email") as string;
-// //   const password = formData.get("password") as string;
-
-// //   const response = await fetch("http://localhost:3000/api/auth/login", {
-// //     method: "POST",
-// //     headers: { "Content-Type": "application/json" },
-// //     body: JSON.stringify({ email, password }),
-// //     credentials: "include"
-// //   });
-// //   const data = await response.json();
-// // if (!response.ok ) {
-// //     throw new Error('Failed to login');
-// // }
-
-// //   console.log(data);
-// //   if (data.error) {
-// //     throw new Error(data.error);
-// //   }
 
 
 // // } // SignInAction
@@ -51,12 +27,12 @@ export default function LoginPage() {
             <div className=" flex justify-center items-center h-screen relative">
                 <div className="w-full">
 
-                    <Image src={futuristicCar} fill alt="futuristic_car" className="object-cover blur-md  " placeholder="blur" priority />
+                    <Image src={loginBg} fill alt="futuristic_car" className="object-cover   " placeholder="blur" priority />
                 </div>
-                <Card className="w-full max-w-sm text-3xl bg-gradient-to-br from-blue-500 to-sky-400/30 glass backdrop-blur absolute shadow-3xl shadow-sky-400 border-[#cd090a] border  ">
+                <Card className="w-full max-w-sm text-3xl bg-gradient-to-br from-[#5d0002] to-sky-400/30 glass backdrop-blur absolute shadow-3xl shadow-sky-400 border-[#cd090a] border  ">
                     <CardHeader>
-                        <CardTitle>Login to your account</CardTitle>
-                        <CardDescription className="text-white">
+                        <CardTitle className="text-white">Login to your account</CardTitle>
+                        <CardDescription className="text-white/70">
                             Enter your email below to login to your account
                         </CardDescription>
                         <CardAction>
@@ -70,27 +46,27 @@ export default function LoginPage() {
                     <CardContent>
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
+                                <Label htmlFor="email" className="text-[#ffffff]">Email</Label>
                                 <input
                                     id="email"
                                     type="email"
                                     placeholder="m@example.com"
                                     required
-                                    className="placeholder:text-white"
+                                    className="input bg-transparent text-xl  placeholder:text-gray-500 "
                                     name="email"
                                 />
                             </div>
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Password</Label>
-                                    <a
-                                        href="#"
+                                    <Link
+                                        href={"/auth/forgot-password"}
                                         className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                                     >
                                         Forgot your password?
-                                    </a>
+                                    </Link>
                                 </div>
-                                <input id="password" type="password" required name="password" />
+                                <input id="password" type="password" required name="password" placeholder="password" />
                             </div>
                         </div>
                     </CardContent>

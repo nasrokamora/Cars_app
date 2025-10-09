@@ -6,7 +6,7 @@ export async function LoginAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/login}`, {
+  const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -19,8 +19,8 @@ export async function LoginAction(formData: FormData) {
   if (setCookie) {
     const cookieStore = cookies();
     const cookieList = setCookie
-      .split(", ")
-      .filter((cookie) => cookie.includes("token"));
+      .split(/,(?=\s*[a-zA-Z0-9_\-]+=)/)
+      .filter((cookie) => cookie.includes("access_token"));
     for (const cookie of cookieList) {
       const [name, value] = cookie.split(";")[0].split("=");
       (await cookieStore).set(name.trim(), value.trim());
