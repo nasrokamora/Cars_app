@@ -1,6 +1,10 @@
 // src/user/user.service.ts
 
-import { Injectable, UnauthorizedException } from '@nestjs/common'; // نستورد Injectable للخدمة و BadRequestException لرفع أخطاء
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'; // نستورد Injectable للخدمة و BadRequestException لرفع أخطاء
 import { PrismaService } from 'src/prisma/prisma.service'; // نستورد خدمة Prisma للتفاعل مع قاعدة البيانات
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
@@ -32,7 +36,7 @@ export class UserService {
       where: { email }, // نبحث عن مستخدم بنفس البريد
     });
     if (existingUser) {
-      throw new UnauthorizedException('User with this email already exists'); // إذا وجد، نرفع خطأ
+      throw new ConflictException('User with this email already exists');
     }
 
     const salt = await bcrypt.genSalt(10); // نحصل على ملح لتشفير كلمة المرور

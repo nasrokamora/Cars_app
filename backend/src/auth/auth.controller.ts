@@ -211,4 +211,10 @@ export class AuthController {
   protected() {
     return this.authService.protected();
   }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@User() user: AuthUser) {
+    return user;
+  }
 }

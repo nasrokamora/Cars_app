@@ -9,7 +9,6 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
-    NavigationMenuViewport,
 } from "@/components/ui/navigation-menu"
 // import { componentsLink } from "./NavigationMenu"
 import Link from "next/link"
