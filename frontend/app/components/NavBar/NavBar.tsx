@@ -12,73 +12,65 @@ import Image from "next/image";
 import logoCarHub from '@/public/logo_Cars_Hub.png'
 import logoCarHub_white_v from '@/public/logo_png_Cars_Hub_white_v.png'
 import ToggleMenu from "./ToggleMenu/ToggleMenu";
-import { cookies } from "next/headers";
 // import NavigationMenuExample from "./NavigationMenu";
 
 
-export default async function NavBar() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  let user: { username?: string; email?: string } | null = null;
-
-  if (accessToken) {
-    try {
-      // ✅ جلب بيانات المستخدم من NestJS مباشرة
-      const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        cache: "no-store", // حتى لا يخزن الرد في الكاش
-      });
-
-      if (response.ok) {
-        user = await response.json();
-      }
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    }
-  }
+export default function NavBar() {
     return (
-    <nav className="flex justify-between items-center px-8 py-4 bg-white shadow-sm">
-      <div className="text-2xl font-bold">CARS HUB</div>
+        <nav className="navbar relative z-50  gap-1 justify-around items-center border-b border-gray-400  ">
+            <div className="" >
 
-      <div className="flex gap-4 items-center">
-        <Link href="/">Home</Link>
-        <Link href="/cars">Cars</Link>
-        <Link href="/vehicles">Vehicles</Link>
-        <Link href="/research">Research</Link>
+                {/* icon link  */}
+                <Link href={"/"} className="m-1 text-xl md:text-2xl font-bold lg:text-3xl xl:text-3xl hidden">
+                    <AuroraText colors={["#FF0000", "#7928CA", "#0070F3", "#38fdf8"]}>
+                        Cars Hub
+                    </AuroraText>
+                </Link>
 
-        {!accessToken || !user ? (
-          <>
-            <Link
-              href="/auth/login"
-              className="px-3 py-1 border rounded-md hover:bg-gray-100"
-            >
-              Login
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Get Started
-            </Link>
-          </>
-        ) : (
-          <div className="flex items-center gap-3">
-            <div className="font-medium">{user.username || user.email}</div>
-            <form action="/auth/logout" method="post">
-              <button
-                type="submit"
-                className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-              >
-                Logout
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
-    </nav>
-  );
-    
+                {/* logo link  */}
+                <div className="">
+                    <Link href={"/"} className="">
+                    {/* white mode */}
+                        <Image src={logoCarHub} width={70} height={70} alt="logo_carhub_black" priority className="dark:hidden"  placeholder="blur"/>
+                    
+                    {/* dark mode */}
+                    <Image src={logoCarHub_white_v} width={70} height={70} alt="logo_carhub_white" priority className="hidden dark:block "  placeholder="blur"/>
+                    </Link>
+                </div>
+
+
+            </div>
+            {/* navigation menu md => all */}
+            <div>
+                <NavigationsMenu />
+            </div>
+
+            {/* navigation menu lg => all */}
+            <div>
+                <NavigationsLargeLayout />
+            </div>
+
+            {/* login and sign up lg => all */}
+            <div>
+                <LoginSignUpButton />
+            </div>
+
+            {/* dark mode toggle */}
+            <div className=" flex justify-center items-center gap-2  ">
+                <div className="mr-2">
+                    {/* md => lg */}
+                    {/* <DropdownMenuLinks /> */}
+                </div>
+                {/* xs => md */}
+                <ToggleMenu />
+                {/* toggle dark mode */}
+                <AnimatedThemeToggler className="bg-none" />
+            </div>
+
+            {/* commend CTRL + K to open Commend research */}
+            <div>
+                <CommandMenu />
+            </div>
+        </nav>
+    )
 }
