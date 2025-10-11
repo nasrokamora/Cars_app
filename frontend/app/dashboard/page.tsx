@@ -13,7 +13,7 @@ import { LogoutAction } from "../api/auth/logout/action"
 
 export default function DashboardHeader() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-screen">
+    <header className="sticky top-0  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-screen">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           Dashboard
