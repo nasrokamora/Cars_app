@@ -5,7 +5,7 @@ export async function middleware(req: NextRequest) {
   const refreshToken = req.cookies.get("refresh_token");
 
   if (!accessToken && !refreshToken) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return NextResponse.redirect(new URL("/auth/register", req.url));
   }
     if (accessToken) {
     return NextResponse.next();
@@ -26,6 +26,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/signup"],
+  matcher: ["/dashboard/:path*"],
 };
 

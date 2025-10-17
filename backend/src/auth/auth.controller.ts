@@ -96,7 +96,7 @@ export class AuthController {
     // تخزين التوكن في كوكيز
     res.cookie('refresh_token', refreshToken, this.cookieOptionsRefresh());
     res.cookie('access_token', accessToken, this.cookieOptionsAccess());
-    return { user };
+    return { user, message: 'User registered successfully' };
   }
 
   // -------------------------
@@ -125,7 +125,7 @@ export class AuthController {
 
       res.cookie('refresh_token', newRefresh, this.cookieOptionsRefresh());
 
-      return { accessToken };
+      return { accessToken, message: 'Refreshed' };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw new BadRequestException('Invalid refresh token');
@@ -160,7 +160,7 @@ export class AuthController {
       this.cookieOptionsRefresh(),
     );
 
-    return { user };
+    return { user, message: 'User logged in successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
