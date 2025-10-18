@@ -1,16 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class RefreshTokenService {
-  constructor(private readonly prisma: PrismaService) {}
+  private hmacSrecret: string;
+  constructor(private readonly prisma: PrismaService) {
+    this.hmacSrecret = process.env.HMAC_SECRET ?? '';
+    if (!this.hmacSrecret)
+      throw new InternalServerErrorException('HMAC secret not defined');
+  }
 
-  private hmacFingerprint(token: string) {
-    const secret = process.env.HMAC_SECRET;
-    if (!secret) throw new Error('HMAC_SECRET is not defined');
-    return crypto.createHmac('sha256', secret).update(token).digest('hex');
+  private hmacFingerprint(token: string): string {
+    return crypto
+      .createHmac('sha256', this.hmacSrecret)
+      .update(token)
+      .digest('hex');
   }
 
   //نقوم بانشاء refresh token جديد فل DB
@@ -65,10 +71,8 @@ export class RefreshTokenService {
   async validateByPresentedToken(userId: string, presentedToken: string) {
     const fingerprint = this.hmacFingerprint(presentedToken);
     const token = await this.findByFingerprint(fingerprint);
-    if (!token) return false;
+    if (!token || token.revokedAt || token.expiresAt < new Date()) return false;
     if (token.userId !== userId) return false;
-    if (token.revokedAt) return false;
-    if (token.expiresAt < new Date()) return false;
     const isValid = await argon2.verify(token.tokenHash, fingerprint);
     return isValid;
   }
@@ -101,58 +105,4 @@ export class RefreshTokenService {
       data: { revokedAt: new Date() },
     });
   }
-
-  // async findByJti(jti: string) {
-  //   return await this.prisma.refreshToken.findUnique({
-  //     where: {
-  //       jti,
-  //     },
-  //   });
-  // }
-
-  // async revokeByJti(jti: string, userId: string, replacedBy?: string) {
-  //   return await this.prisma.refreshToken.updateMany({
-  //     where: { jti, userId, revokedAt: null },
-  //     data: { revokedAt: new Date(), replacedBy },
-  //   });
-  // }
-
-  //نتحقق من وجود refresh token في DB function
-
-  // async validate(userId: string, refreshToken: string): Promise<boolean> {
-  //   const tokens = await this.prisma.refreshToken.findMany({
-  //     where: {
-  //       userId,
-  //       revokedAt: null,
-  //       expiresAt: { gte: new Date() }, // صالح إلى الآن
-  //     },
-  //   });
-  //   for (const token of tokens) {
-  //     const isValid = await bcrypt.compare(refreshToken, token.tokenHash);
-  //     if (isValid) return true;
-  //   }
-  //   return false;
-  // }
-
-  // async revokedById(userId: string, refreshToken: string) {
-  //   const token = await this.prisma.refreshToken.findMany({
-  //     where: { userId, revokedAt: null },
-  //   });
-  //   for (const t of token) {
-  //     const isMAtch = await bcrypt.compare(refreshToken, t.tokenHash);
-  //     if (isMAtch) {
-  //       await this.prisma.refreshToken.update({
-  //         where: { id: t.id },
-  //         data: { revokedAt: new Date() },
-  //       });
-  //       break; //break to stop loop
-  //     }
-  //   }
-  // }
-
-  //   await this.prisma.refreshToken.updateMany({
-  //     where: { userId, tokenHash: refreshToken, revokedAt: null },
-  //     data: { revokedAt: new Date() },
-  //   });
-  // }
 }
