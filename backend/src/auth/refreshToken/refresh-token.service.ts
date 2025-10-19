@@ -2,12 +2,16 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RefreshTokenService {
   private hmacSrecret: string;
-  constructor(private readonly prisma: PrismaService) {
-    this.hmacSrecret = process.env.HMAC_SECRET ?? '';
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {
+    this.hmacSrecret = this.config.get<string>('HMAC_SECRET') ?? '';
     if (!this.hmacSrecret)
       throw new InternalServerErrorException('HMAC secret not defined');
   }

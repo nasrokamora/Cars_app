@@ -27,6 +27,15 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  private GetCookiesName() {
+    const isProduction = process.env.NODE_ENV === 'production';
+    return {
+      accessT: isProduction ? '__Host-at' : 'access_token',
+      refreshT: isProduction ? '__Host-rt' : 'refresh_token',
+    };
+  }
+  names = this.GetCookiesName();
+
   // Helper: يحوّل قيم مثل '15m','7d','3600s' أو أرقام إلى milliseconds
   private parseExpiryToMs(value?: string | number, fallback = 15 * 60 * 1000) {
     if (!value) return fallback;
@@ -94,8 +103,8 @@ export class AuthController {
     );
 
     // تخزين التوكن في كوكيز
-    res.cookie('refresh_token', refreshToken, this.cookieOptionsRefresh());
-    res.cookie('access_token', accessToken, this.cookieOptionsAccess());
+    res.cookie(this.names.refreshT, refreshToken, this.cookieOptionsRefresh());
+    res.cookie(this.names.accessT, accessToken, this.cookieOptionsAccess());
     return { user, message: 'User registered successfully' };
   }
 
@@ -108,7 +117,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const presented = req.cookies?.['refresh_token'] as string | undefined;
+    const presented = req.cookies?.[this.names.refreshT] as string | undefined;
     if (!presented) {
       return { message: 'No refresh token provided' };
     }
@@ -123,7 +132,7 @@ export class AuthController {
           req.get('user-agent') || '',
         );
 
-      res.cookie('refresh_token', newRefresh, this.cookieOptionsRefresh());
+      res.cookie(this.names.refreshT, newRefresh, this.cookieOptionsRefresh());
 
       return { accessToken, message: 'Refreshed' };
     } catch (error) {
@@ -150,12 +159,12 @@ export class AuthController {
     );
 
     res.cookie(
-      process.env.ACCESS_COOKIE_NAME || 'access_token',
+      process.env.ACCESS_COOKIE_NAME || this.names.accessT,
       accessToken,
       this.cookieOptionsAccess(),
     );
     res.cookie(
-      process.env.REFRESH_COOKIE_NAME || 'refresh_token',
+      process.env.REFRESH_COOKIE_NAME || this.names.refreshT,
       refreshToken,
       this.cookieOptionsRefresh(),
     );
@@ -170,7 +179,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const presented = req.cookies?.['refresh_token'] as string | undefined;
+    const presented = req.cookies?.[this.names.refreshT] as string | undefined;
     if (presented) {
       try {
         const payload = await this.authService[
@@ -186,8 +195,8 @@ export class AuthController {
         console.log(err);
       }
     }
-    res.clearCookie('access_token', this.cookieOptionsAccess());
-    res.clearCookie('refresh_token', this.cookieOptionsRefresh());
+    res.clearCookie(this.names.accessT, this.cookieOptionsAccess());
+    res.clearCookie(this.names.refreshT, this.cookieOptionsRefresh());
     console.log('loged out successfully');
     return { message: 'Logged out successfully' };
   }
@@ -201,8 +210,8 @@ export class AuthController {
   ) {
     await this.authService.logoutFromAllDevice(user.id);
 
-    res.clearCookie('access_token', this.cookieOptionsAccess());
-    res.clearCookie('refresh_token', this.cookieOptionsRefresh());
+    res.clearCookie(this.names.accessT, this.cookieOptionsAccess());
+    res.clearCookie(this.names.refreshT, this.cookieOptionsRefresh());
     return { message: 'Logged out from all devices successfully' };
   }
 
