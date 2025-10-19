@@ -10,7 +10,7 @@ import {
 import { useState } from "react"
 import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+// import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 
@@ -88,7 +88,7 @@ export function SearchInput({
         />
         
         <Label className="sr-only">Search</Label>
-        <Input
+        <input
           type="text"
           placeholder={placeholder}
           value={query}
@@ -97,7 +97,7 @@ export function SearchInput({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={cn(
-            "border-0 bg-transparent pl-10 pr-20 focus-visible:ring-0 focus-visible:ring-offset-0",
+            "border-0 bg-transparent pl-10 pr-20 focus-visible:ring-0 focus-visible:ring-offset-0 input",
             sizeClasses[size],
           )}
         />

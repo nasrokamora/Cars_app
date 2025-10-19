@@ -15,14 +15,14 @@ export default function RegisterPage() {
                     <input
                         type="username"
                         placeholder="Username"
-                        className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                        className="w-full p-2 border rounded-lg dark:bg-gray-700 input"
                         name="username"
                     />
                     <Label htmlFor="email">Email</Label>
                     <input
                         type="email"
                         placeholder="Email"
-                        className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                        className="w-full p-2 border rounded-lg dark:bg-gray-700 input"
                         name="email"
                         id="email"
                     />
@@ -36,7 +36,7 @@ export default function RegisterPage() {
                     />
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                        className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition input"
                     >
                         Register
                     </button>

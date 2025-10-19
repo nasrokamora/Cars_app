@@ -34,7 +34,7 @@ export default async function LoginSignUpButton() {
     }
     return (
         <div className="  justify-center items-center gap-3 ">
-            {!accessToken && !user ? (
+            {!accessToken || !user ? (
                 <div>
 
                     <div className="sm:flex hidden flex-1 gap-3">
