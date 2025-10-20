@@ -15,6 +15,7 @@ class ImageInput {
 export class CreateCarDto {
   @IsString()
   title: string;
+
   @IsString()
   discription: string;
 
