@@ -46,5 +46,5 @@ export async function CarAction(formData: FormData) {
   }
   
 }
- revalidatePath('/cars');
+ revalidatePath('/dashboard');
 

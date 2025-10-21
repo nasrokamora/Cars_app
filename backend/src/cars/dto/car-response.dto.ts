@@ -42,14 +42,16 @@ export class CarResponseDto {
 
   @Expose()
   @Transform(
-    ({ obj }: { obj: { brand?: { name?: string } } }) => obj.brand?.name ?? '',
+    ({ obj }: { obj: { brand?: { name?: string; id?: string } } }) =>
+      obj.brand?.name ?? '',
   )
   @IsString()
   brand: string;
 
   @Expose()
-  @Transform(({ obj }: { obj: { category?: { name: string }[] } }) =>
-    Array.isArray(obj.category) ? obj.category.map((c) => c.name) : [],
+  @Transform(
+    ({ obj }: { obj: { category?: { name: string; id: string }[] } }) =>
+      Array.isArray(obj.category) ? obj.category.map((c) => c.name) : [],
   )
   @IsString({ each: true })
   @IsArray()
@@ -58,7 +60,7 @@ export class CarResponseDto {
   @Expose()
   @ValidateNested({ each: true })
   @Type(() => ImageDto)
-  images: ImageDto[];
+  images?: ImageDto[];
 
   @IsDate()
   @Expose()

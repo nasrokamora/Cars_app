@@ -57,7 +57,7 @@ export class CarsService {
           category: true,
           images: true,
           owner: { select: { username: true } },
-          Message: true,
+          Message: false,
         },
         orderBy: { createdAt: 'desc' },
       }),

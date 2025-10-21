@@ -34,7 +34,7 @@ export default async function LoginSignUpButton() {
     }
     return (
         <div className="  justify-center items-center gap-3 ">
-            {!accessToken || !user ? (
+            {!accessToken && !user ? (
                 <div>
 
                     <div className="sm:flex hidden flex-1 gap-3">
@@ -44,9 +44,6 @@ export default async function LoginSignUpButton() {
                                 <LinkPropsHref href="/auth/login" className=" text-center">
                                     Login
                                 </LinkPropsHref>
-                                {/* <Link href="/auth/login" className=" text-center">
-                            Login
-                        </Link> */}
                             </div>
                         </Button>
 
@@ -82,23 +79,7 @@ export default async function LoginSignUpButton() {
             ) : (
                 <div>
                     <UserProfile user={user as Users} />
-                    {/* <div className="flex items-center gap-3 ">
-                        <form action={LogoutAction}>
-                            <button
-                                type="submit"
-                                className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                            >
-                                Logout
-                            </button>
-                        </form>
-                    </div>
-                    <div key={user?.id}>
-
-                    </div>
-                            {/* <h1 className="text-black">{user?.email}</h1> */}
-
                 </div>
-
             )}
         </div>
     )

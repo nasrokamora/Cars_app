@@ -31,3 +31,20 @@ export async function getCategories() {
         throw new Error("Failed to fetch categories");
     }
 }
+
+
+export async function getAllCars(){
+    try{
+        const response = await fetch(`${process.env.NEXT_NEST_API_URL}/cars/allcars`,{
+            headers:{ "Content-Type": "application/json" },
+            cache:"no-store",
+        })
+        if(!response.ok){
+            throw new Error("Failed to fetch cars");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        throw new Error("Failed to fetch cars");
+    }
+}
