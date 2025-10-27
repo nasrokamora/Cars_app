@@ -12,6 +12,7 @@ import { MessagesModule } from './messages/messages.module';
 import { CategoriesModule } from './categories/categories.module';
 // import { ServeStaticModule } from '@nestjs/serve-static';
 // import { join } from 'path';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CategoriesModule } from './categories/categories.module';
     ImagesModule,
     MessagesModule,
     CategoriesModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

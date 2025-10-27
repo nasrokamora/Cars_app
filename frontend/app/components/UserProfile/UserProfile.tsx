@@ -16,10 +16,10 @@ export default function UserProfile({ user }: { user: User }) {
                 <div tabIndex={0} role="button" className="m-1 cursor-pointer">
                     <Avatar>
                         <AvatarImage src={CarProfile.src} alt="User" />
-                        <AvatarFallback> {user.username.slice(0, 3)} </AvatarFallback>
+                        {/* <AvatarFallback> {user.username.slice(0, 3)} </AvatarFallback> */}
                     </Avatar>
-                    <h1>{user.username}</h1>
-                    <h1>{user.email}</h1>
+                    <h1>{user?.username}</h1>
+                    <h1>{user?.email}</h1>
                 </div>
                 <ul tabIndex={-1} className="dropdown-content menu bg-white rounded-box z-1 w-52 p-2 shadow-sm dark:bg-gray-800">
                     <li><Link href={'/dashboard'}>Profile</Link></li>

@@ -3,17 +3,28 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
-export async function CarAction(formData: FormData) {
+export async function CreateCarAction(formData: FormData) {
   const access_token = (await cookies()).get("access_token")?.value;
   if (!access_token) {
     throw new Error("No access token found");
   }
-  const brandId = formData.get("brandId") as string;
-  const categoryId = formData.get("categoryId") as string;
-  const title = formData.get("title") as string;
-  const discription = formData.get("discription") as string;
-  const price = Number(formData.get("price"));
-  const images = formData.getAll("images") as File[];
+
+  const formDto ={
+    brandId: formData.get("brandId") as string,
+    categoryId: formData.get("categoryId") as string,
+    title: formData.get("title") as string,
+    discription: formData.get("discription") as string,
+    price: Number(formData.get("price")),
+    images: formData.getAll("images") as File[],
+
+  };
+
+  // const brandId = formData.get("brandId") as string;
+  // const categoryId = formData.get("categoryId") as string;
+  // const title = formData.get("title") as string;
+  // const discription = formData.get("discription") as string;
+  // const price = Number(formData.get("price"));
+  // const images = formData.getAll("images") as File[];
 
   try {
     const response = await fetch(
@@ -24,14 +35,7 @@ export async function CarAction(formData: FormData) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${access_token}`,
         },
-        body: JSON.stringify({
-          brandId,
-          categoryId,
-          title,
-          discription,
-          price,
-          images,
-        }),
+        body: JSON.stringify({ formDto }),
         cache: "no-store",
       }
     );
@@ -45,6 +49,6 @@ export async function CarAction(formData: FormData) {
     throw new Error("Error creating car: " + (error as Error).message);
   }
   
+  revalidatePath('/dashboard');
 }
- revalidatePath('/dashboard');
 

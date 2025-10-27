@@ -11,8 +11,24 @@ import {
 // import LogoutButton from "../(auth)/auth/logout/Logout"
 import { LogoutAction } from "../api/auth/logout/action"
 import AddCars from "../components/AddCars/AddCars"
+import { cookies } from "next/headers"
 
-export default function DashboardHeader() {
+
+
+export default async function DashboardHeader() {
+  // const data = await getProfile();
+  const accessToken = (await cookies()).get("access_token")?.value;
+  if (!accessToken) throw new Error("No access token found");
+
+  const response = await fetch(`${process.env.NEXT_NEST_API_URL}/profile`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  })
+  const data = await response.json();
+
   return (
     <header className="sticky  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-screen container">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -46,8 +62,19 @@ export default function DashboardHeader() {
         </DropdownMenu>
       </div>
 
-      <div className=" mt-10 container">
-          <AddCars />
+      <div className=" flex flex-col mt-10 container ml-5 border rounded-md border-black w-fit p-3 cursor-pointer hover:bg-black hover:text-white">
+        <AddCars />
+        <div>
+        {data.cars?.map((car) => (
+          <div
+            key={car.id}
+            className="p-4 bg-white rounded-xl shadow space-y-2"
+          >
+            <h3 className="text-lg font-semibold">{car.name}</h3>
+            <p>السعر: {car.price} $</p>
+          </div>
+        ))}
+        </div>
       </div>
     </header>
   )
