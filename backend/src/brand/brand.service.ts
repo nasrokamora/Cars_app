@@ -9,10 +9,10 @@ export class BrandService {
 
   async findAllBrands(): Promise<Brand[]> {
     return await this.prisma.brand.findMany({
-        select:{
-          id: true,
-          name: true
-        }
+      select: {
+        id: true,
+        name: true,
+      },
     });
   }
 
@@ -22,7 +22,7 @@ export class BrandService {
       select: {
         id: true,
         name: true,
-      }
+      },
     });
     if (!brand) {
       throw new NotFoundException('Brand not found');

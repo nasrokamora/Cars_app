@@ -10,24 +10,30 @@ import {
 } from "@/components/ui/dropdown-menu"
 // import LogoutButton from "../(auth)/auth/logout/Logout"
 import { LogoutAction } from "../api/auth/logout/action"
-import AddCars from "../components/AddCars/AddCars"
+// import AddCars from "../components/AddCars/AddCars"
 import { cookies } from "next/headers"
+import { getBrands, getCategories } from "../libs/api"
+import CreateCarForm from "../components/CreateCarForm/CreateCarForm"
+import CarsList from "../components/UserProfile/CarList"
 
-
-
-export default async function DashboardHeader() {
-  // const data = await getProfile();
-  const accessToken = (await cookies()).get("access_token")?.value;
-  if (!accessToken) throw new Error("No access token found");
-
-  const response = await fetch(`${process.env.NEXT_NEST_API_URL}/profile`, {
-    method: "GET",
+async function getUserCars(accessToken: string) {
+  const res = await fetch(`${process.env.NEXT_NEST_API_URL}/profile`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
     cache: "no-store",
-  })
-  const data = await response.json();
+  });
+  if (!res.ok) return [];
+  const user = await res.json();
+  return user.cars ?? [];
+}
+
+export default async function DashboardHeader() {
+  // const data = await getProfile();
+  const accessToken = (await cookies()).get("access_token")?.value;
+  if (!accessToken) throw new Error("Unauthorized");
+
+const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars(accessToken)]);
 
   return (
     <header className="sticky  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-screen container">
@@ -62,7 +68,12 @@ export default async function DashboardHeader() {
         </DropdownMenu>
       </div>
 
-      <div className=" flex flex-col mt-10 container ml-5 border rounded-md border-black w-fit p-3 cursor-pointer hover:bg-black hover:text-white">
+
+        <div>
+          <CreateCarForm brands={brands} categories={categories} initialCars={cars} />
+        </div>
+        <CarsList cars={cars} />
+      {/* <div className=" flex flex-col mt-10 container ml-5 border rounded-md border-black w-fit p-3 cursor-pointer hover:bg-black hover:text-white">
         <AddCars />
         <div>
         {data.cars?.map((car) => (
@@ -75,7 +86,7 @@ export default async function DashboardHeader() {
           </div>
         ))}
         </div>
-      </div>
+      </div> */}
     </header>
   )
 }
