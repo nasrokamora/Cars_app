@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
+
 // import * as bcrypt from 'bcrypt';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,9 +10,7 @@ async function bootstrap() {
   // -----------------------------
   // Cookie parser -
   // -----------------------------
-
   app.use(cookieParser());
-
   // -----------------------------
   // CORS - ضروري إذا كان FE في دومين آخر ويستخدم الكوكيز
   // credentials: true يسمح بارسال واستقبال الكوكيز

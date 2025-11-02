@@ -8,6 +8,8 @@ import { RefreshTokenService } from './refreshToken/refresh-token.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { randomUUID } from 'crypto';
 import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
+import { JwtPayload } from './interface/jwt-payload.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
+    private readonly configService: ConfigService,
     // private readonly logger: Logger = new Logger(AuthService.name),
   ) {}
 
@@ -35,25 +38,23 @@ export class AuthService {
 
   private async generateTokens(userId: string, email?: string) {
     const jwtId = randomUUID(); // إنشاء معرف فريد لكل توكن
+    const payload: JwtPayload = { sub: userId, email };
     const accessToken = await this.jwtService.signAsync(
+      payload,
+
       {
-        sub: userId,
-        email,
-      },
-      {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN') || '15m',
       },
     );
 
     const refreshToken = await this.jwtService.signAsync(
+      payload,
+
       {
-        sub: userId,
-        email,
-      },
-      {
-        secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn:
+          this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d',
         jwtid: jwtId,
       },
     );

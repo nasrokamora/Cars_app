@@ -13,12 +13,12 @@ interface FormState {
 }
 
 export default function CreateCarForm({
-    brands,
-    categories,
+    brand,
+    category,
     initialCars
 }: {
-    brands: Brand[],
-    categories: Category[],
+    brand: Brand[],
+    category: Category[],
     initialCars: Car[]
 }) {
 
@@ -30,7 +30,6 @@ export default function CreateCarForm({
     const handleSubmit = async (FormData: FormData) => {
 
         const tempCar: Car = {
-            id: Math.random().toString(),
             title: FormData.get("title") as string,
             brandId: FormData.get("brandId") as string,
             categoryId: FormData.get("categoryId") as string,
@@ -61,14 +60,14 @@ export default function CreateCarForm({
                     required
                 />
                 <textarea
-                    name="description"
+                    name="discription"
                     placeholder="الوصف (اختياري)"
                     className="border p-2 w-full rounded"
                 />
 
                 <select name="brandId" className="border p-2 w-full rounded" required>
                     <option value="">اختر العلامة التجارية</option>
-                    {brands.map((b) => (
+                    {brand.map((b) => (
                         <option key={b.id} value={b.id}>
                             {b.name}
                         </option>
@@ -77,7 +76,7 @@ export default function CreateCarForm({
 
                 <select name="categoryId" className="border p-2 w-full rounded" required>
                     <option value="">اختر الفئة</option>
-                    {categories.map((c) => (
+                    {category.map((c) => (
                         <option key={c.id} value={c.id}>
                             {c.name}
                         </option>

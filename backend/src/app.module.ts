@@ -19,10 +19,7 @@ import { ProfileModule } from './profile/profile.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'public'),
-    //   serveRoot: '/public/',
-    // }),
+
     PrismaModule,
     AuthModule,
     UsersModule,

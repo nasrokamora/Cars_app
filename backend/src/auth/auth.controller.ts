@@ -22,10 +22,14 @@ import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 // import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   private GetCookiesName() {
     const isProduction = process.env.NODE_ENV === 'production';
@@ -56,12 +60,15 @@ export class AuthController {
     }
     return fallback;
   }
+
+  private isProd() {
+    return process.env.NODE_ENV === 'production';
+  }
+
   private cookieOptionsAccess() {
     return {
       httpOnly: true,
       secure: false,
-      // // process.env.COOKIE_SECURE === 'true' ||
-      // // process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'none' as const,
       path: '/',
@@ -74,11 +81,9 @@ export class AuthController {
     return {
       httpOnly: true,
       secure: false,
-      // // process.env.COOKIE_SECURE === 'true' ||
-      // // process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN || 'localhost',
       sameSite: 'none' as const,
-      path: '/auth/refresh',
+      path: '/',
       maxAge:
         this.parseExpiryToMs(process.env.JWT_REFRESH_EXPIRES_IN) ||
         7 * 24 * 60 * 60 * 1000, // 7 days
@@ -131,10 +136,10 @@ export class AuthController {
           req.ip,
           req.get('user-agent') || '',
         );
-
+      res.cookie(this.names.accessT, accessToken, this.cookieOptionsAccess());
       res.cookie(this.names.refreshT, newRefresh, this.cookieOptionsRefresh());
 
-      return { accessToken, message: 'Refreshed' };
+      return { accessToken, message: 'Refreshed successfully' };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw new BadRequestException('Invalid refresh token');

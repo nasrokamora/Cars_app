@@ -10,11 +10,16 @@ interface FormState {
   data?: unknown;
 }
 
-export async function CreateCarAction(PrevState: FormState, formData: FormData) {
-    const accessToken = (await cookies()).get("access_token")?.value;
-    if(!accessToken) {
-        return { success: false, message: "Unauthorized",status: 401 };
-    }
+export async function CreateCarAction(
+  PrevState: FormState,
+  formData: FormData
+) {
+  const cookieStore = cookies();
+  const access_token = (await cookieStore).get("access_token")?.value;
+  // const accessToken = (await cookies()).get("access_token")?.value;
+  if (!access_token) {
+    return { success: false, message: "Unauthorized", status: 401 };
+  }
   try {
     const car = {
       title: formData.get("title") as string,
@@ -25,16 +30,19 @@ export async function CreateCarAction(PrevState: FormState, formData: FormData) 
     };
 
     const response = await fetch(
-      `http://localhost:3000/api/cars/create`,
+      `${process.env.NEXT_NEST_API_URL}/cars/create-car`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
         body: JSON.stringify(car),
         cache: "no-store",
-        credentials: "include",
       }
     );
     const data = await response.json();
+    console.log("Create car response data:", data);
     if (!response.ok) {
       return { success: false, message: data.error || "Failed to create car" };
     }

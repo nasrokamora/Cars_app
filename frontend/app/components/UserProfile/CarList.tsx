@@ -1,6 +1,7 @@
 import type { Car } from "@/app/types/car";
 
 export default function CarsList({ cars }: { cars: Car[] }) {
+  console.log(cars);
   return (
     <ul className="mt-6 space-y-2">
       {cars.map((car) => (

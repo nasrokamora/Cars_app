@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service'; // خدمة المصادقة
 import { AuthController } from './auth.controller'; // تحكم بالمسارات (routes) الخاصة بالمصادقة
 import { PassportModule } from '@nestjs/passport'; // نحتاجها لتكامل Passport مع NestJS
-import { JwtModule } from '@nestjs/jwt'; // لإنشاء التوكنات JWT
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt'; // لإنشاء التوكنات JWT
 import { ConfigModule, ConfigService } from '@nestjs/config'; // لقراءة متغيّرات البيئة
 import { JwtStrategy } from './strategies/jwt.strategy'; // استراتيجية JWT
 import { LocalStrategy } from './strategies/local.strategy'; // استراتيجية Local (مبنية على البريد وكلمة المرور)
@@ -18,13 +18,12 @@ import { RefreshTokenService } from './refreshToken/refresh-token.service';
     JwtModule.registerAsync({
       imports: [ConfigModule], // نستورد ConfigModule لكي نستخدم ConfigService
       inject: [ConfigService], // نحقن ConfigService في المصنع (useFactory)
-      useFactory: (configService: ConfigService) =>
-        Promise.resolve({
-          secret: configService.get<string>('JWT_SECRET'), // سرّ توقيع JWT مأخوذ من متغيّر البيئة
-          signOptions: {
-            expiresIn: configService.get<string>('JWT_EXPIRES_IN'), // مدة صلاحية التوكن (مثلاً '3600s' أو '1h')
-          },
-        }),
+      useFactory: (configService: ConfigService): JwtModuleOptions => ({
+        secret: configService.get<string>('JWT_SECRET'), // نقرأ السر من متغيّرات البيئة
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '15m', // نقرأ مدة انتهاء الصلاحية
+        },
+      }),
     }),
   ],
   providers: [

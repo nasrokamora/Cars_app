@@ -31,7 +31,7 @@ async function getUserCars(accessToken: string) {
 export default async function DashboardHeader() {
   // const data = await getProfile();
   const accessToken = (await cookies()).get("access_token")?.value;
-  if (!accessToken) throw new Error("Unauthorized");
+  if (!accessToken) throw new Error(`Unauthorized`);
 
 const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars(accessToken)]);
 
@@ -70,9 +70,12 @@ const [brands, categories, cars] = await Promise.all([getBrands(), getCategories
 
 
         <div>
-          <CreateCarForm brands={brands} categories={categories} initialCars={cars} />
+          <CreateCarForm brand={brands} category={categories} initialCars={cars} />
         </div>
+        <div className='mt-10'>
+
         <CarsList cars={cars} />
+        </div>
       {/* <div className=" flex flex-col mt-10 container ml-5 border rounded-md border-black w-fit p-3 cursor-pointer hover:bg-black hover:text-white">
         <AddCars />
         <div>

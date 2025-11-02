@@ -8,8 +8,8 @@ export interface Car {
   image?: string;
   createdAt?: string;
   updatedAt?: string;
-  brands?: Brand;
-  categories?: Category;
+  brand?: Brand;
+  category?: Category;
 }
 
 export interface Brand {

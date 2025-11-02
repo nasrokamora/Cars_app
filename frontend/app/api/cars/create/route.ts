@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const cookieStore = cookies();
   const accessToken = (await cookieStore).get("access_token")?.value;
-  console.log("Cookies:", await cookieStore);
+
   if (!accessToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -19,8 +19,10 @@ export async function POST(request: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          // cookie: request.headers.get("cookie") || "",
+          // Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify(body),
       }
     );

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { User, LogIn, } from "lucide-react"
 // import { HoverButton } from "./HoverButton";
 import { cookies } from "next/headers";
-import { LogoutAction } from "@/app/api/auth/logout/action";
+
 import UserProfile from "../UserProfile/UserProfile";
 
 interface Users {
@@ -31,6 +31,8 @@ export default async function LoginSignUpButton() {
         } catch (err) {
             throw new Error("Failed to get user" + err);
         }
+    }else{
+        user = null;
     }
     return (
         <div className="  justify-center items-center gap-3 ">
