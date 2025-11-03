@@ -13,11 +13,13 @@ import { CategoriesModule } from './categories/categories.module';
 // import { ServeStaticModule } from '@nestjs/serve-static';
 // import { join } from 'path';
 import { ProfileModule } from './profile/profile.module';
+// import { configValidationSchema } from './config/validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // validationSchema: configValidationSchema,
     }),
 
     PrismaModule,

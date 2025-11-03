@@ -17,7 +17,6 @@
     "strict": true,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "ignoreDeprecations": "6.0",
-    "moduleResolution": "node",
+    
   }
 }

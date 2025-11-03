@@ -10,6 +10,7 @@ import { randomUUID } from 'crypto';
 import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 import { JwtPayload } from './interface/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
+import { StringValue } from 'ms';
 
 @Injectable()
 export class AuthService {
@@ -52,9 +53,11 @@ export class AuthService {
       payload,
 
       {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        secret: this.configService.get<string | number>('JWT_REFRESH_SECRET'),
         expiresIn:
-          this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d',
+          Number(
+            this.configService.get<string | number>('JWT_REFRESH_EXPIRES_IN'),
+          ) || '7d',
         jwtid: jwtId,
       },
     );
