@@ -10,4 +10,8 @@ export const configValidationSchema = Joi.object({
     .messages({
       'any.only': 'jwt expiration time must be provided',
     }),
+
+  NODE_ENV: Joi.string()
+    .valid('development', 'production', 'test')
+    .default('development'),
 });

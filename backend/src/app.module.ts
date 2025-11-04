@@ -13,13 +13,16 @@ import { CategoriesModule } from './categories/categories.module';
 // import { ServeStaticModule } from '@nestjs/serve-static';
 // import { join } from 'path';
 import { ProfileModule } from './profile/profile.module';
+import jwtConfig from './config/jwt.config';
+import { configValidationSchema } from './config/validation';
 // import { configValidationSchema } from './config/validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // validationSchema: configValidationSchema,
+      load: [jwtConfig],
+      validationSchema: configValidationSchema,
     }),
 
     PrismaModule,

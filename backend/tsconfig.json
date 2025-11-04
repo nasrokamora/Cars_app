@@ -17,6 +17,6 @@
     "strict": true,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    
+    "strictPropertyInitialization": false
   }
 }

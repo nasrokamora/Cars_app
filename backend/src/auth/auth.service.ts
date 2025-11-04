@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/users.service';
-import * as bcrypt from 'bcrypt'; // مكتبة لتشفير كلمات المرور
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 import { RefreshTokenService } from './refreshToken/refresh-token.service';
@@ -10,7 +9,7 @@ import { randomUUID } from 'crypto';
 import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 import { JwtPayload } from './interface/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
-import { StringValue } from 'ms';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -39,29 +38,47 @@ export class AuthService {
 
   private async generateTokens(userId: string, email?: string) {
     const jwtId = randomUUID(); // إنشاء معرف فريد لكل توكن
-    const payload: JwtPayload = { sub: userId, email };
-    const accessToken = await this.jwtService.signAsync(
-      payload,
 
+    const accessSecret = this.configService.get<string>('JWT_SECRET');
+    if (!accessSecret) {
+      const refreshSecret =
+        this.configService.get<string>('JWT_REFRESH_SECRET');
+      if (!refreshSecret) {
+        throw new Error('JWT_REFRESH_SECRET is not defined in configuration');
+      }
+    }
+    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
+    const accessExpiresIn = this.configService.get<string>('JWT_EXPIRES_IN');
+
+    const refreshExpiresIn = this.configService.get<string>(
+      'JWT_REFRESH_EXPIRES_IN',
+    );
+
+    const accessToken = await this.jwtService.signAsync(
+      { sub: userId, email: email ?? '' },
       {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN') || '15m',
+        secret: accessSecret,
+        expiresIn: accessExpiresIn,
       },
     );
 
     const refreshToken = await this.jwtService.signAsync(
-      payload,
-
+      { sub: userId, email: email ?? '', jwtId },
       {
-        secret: this.configService.get<string | number>('JWT_REFRESH_SECRET'),
-        expiresIn:
-          Number(
-            this.configService.get<string | number>('JWT_REFRESH_EXPIRES_IN'),
-          ) || '7d',
+        secret: refreshSecret,
+        expiresIn: refreshExpiresIn,
         jwtid: jwtId,
       },
     );
+
     return { accessToken, refreshToken, jwtId };
+  }
+
+  private parsExpiresIn(value?: string | number): string | number | undefined {
+    if (!value) return undefined;
+    if (!isNaN(Number(value))) return Number(value);
+    if (typeof value === 'string') return value;
+    return undefined;
   }
 
   // تسجيل مستخدم جديد

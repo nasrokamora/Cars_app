@@ -69,11 +69,13 @@ export class AuthController {
     return {
       httpOnly: true,
       secure: false,
-      domain: process.env.COOKIE_DOMAIN || 'localhost',
+      domain: this.configService.get<string>('COOKIE_DOMAIN') || 'localhost',
       sameSite: 'none' as const,
       path: '/',
       maxAge:
-        this.parseExpiryToMs(process.env.JWT_EXPIRES_IN) || 15 * 60 * 1000, // 15 minutes
+        this.parseExpiryToMs(
+          this.configService.get<string>('JWT_EXPIRES_IN'),
+        ) || 15 * 60 * 1000, // 15 minutes
     };
   }
 
