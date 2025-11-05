@@ -25,8 +25,11 @@ import jwtConfig from 'src/config/jwt.config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService): JwtModuleOptions => {
         return {
-          secret: configService.get('JWT_SECRET'),
-          signOptions: { expiresIn: '60s' },
+          secret:
+            configService.get('JWT_SECRET') ?? configService.get('jwt.secret'),
+          signOptions: {
+            expiresIn: configService.get('JWT_EXPIRES_IN') ?? '15m',
+          },
         };
       },
     }),

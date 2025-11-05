@@ -14,7 +14,7 @@ import { CategoriesModule } from './categories/categories.module';
 // import { join } from 'path';
 import { ProfileModule } from './profile/profile.module';
 import jwtConfig from './config/jwt.config';
-import { configValidationSchema } from './config/validation';
+// import { configValidationSchema } from './config/validation';
 // import { configValidationSchema } from './config/validation';
 
 @Module({
@@ -22,7 +22,7 @@ import { configValidationSchema } from './config/validation';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [jwtConfig],
-      validationSchema: configValidationSchema,
+      // validationSchema: configValidationSchema,
     }),
 
     PrismaModule,

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -8,8 +8,9 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { randomUUID } from 'crypto';
 import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 import { JwtPayload } from './interface/jwt-payload.interface';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import jwtConfig from 'src/config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly configService: ConfigService,
-    // private readonly logger: Logger = new Logger(AuthService.name),
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   // دالة للتحقق من صلاحية بيانات تسجيل الدخول (البريد وكلمة المرور)
@@ -38,38 +40,32 @@ export class AuthService {
 
   private async generateTokens(userId: string, email?: string) {
     const jwtId = randomUUID(); // إنشاء معرف فريد لكل توكن
+    const payload: JwtPayload = {
+      sub: userId,
+      email: email ?? '',
+    };
 
-    const accessSecret = this.configService.get<string>('JWT_SECRET');
-    if (!accessSecret) {
-      const refreshSecret =
-        this.configService.get<string>('JWT_REFRESH_SECRET');
-      if (!refreshSecret) {
-        throw new Error('JWT_REFRESH_SECRET is not defined in configuration');
-      }
+    const accessSecret = this.jwtConfiguration.secret;
+    const refreshSecret = this.jwtConfiguration.refreshSecret;
+    const refreshExpiresIn = this.jwtConfiguration.refreshExpiresIn;
+    // const accessSecret = this.configService.get<string>('JWT_SECRET');
+
+    if (!refreshSecret || !refreshExpiresIn) {
+      throw new Error(
+        'JWT_REFRESH_SECRET or JWT_REFRESH_EXPIRES_IN is not defined in configuration',
+      );
     }
-    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
-    const accessExpiresIn = this.configService.get<string>('JWT_EXPIRES_IN');
 
-    const refreshExpiresIn = this.configService.get<string>(
-      'JWT_REFRESH_EXPIRES_IN',
-    );
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: accessSecret,
+      expiresIn: '15m',
+    });
 
-    const accessToken = await this.jwtService.signAsync(
-      { sub: userId, email: email ?? '' },
-      {
-        secret: accessSecret,
-        expiresIn: accessExpiresIn,
-      },
-    );
-
-    const refreshToken = await this.jwtService.signAsync(
-      { sub: userId, email: email ?? '', jwtId },
-      {
-        secret: refreshSecret,
-        expiresIn: refreshExpiresIn,
-        jwtid: jwtId,
-      },
-    );
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: refreshSecret,
+      expiresIn: '7d',
+      jwtid: jwtId,
+    });
 
     return { accessToken, refreshToken, jwtId };
   }
