@@ -70,12 +70,12 @@ export class AuthService {
     return { accessToken, refreshToken, jwtId };
   }
 
-  private parsExpiresIn(value?: string | number): string | number | undefined {
-    if (!value) return undefined;
-    if (!isNaN(Number(value))) return Number(value);
-    if (typeof value === 'string') return value;
-    return undefined;
-  }
+  // private parsExpiresIn(value?: string | number): string | number | undefined {
+  //   if (!value) return undefined;
+  //   if (!isNaN(Number(value))) return Number(value);
+  //   if (typeof value === 'string') return value;
+  //   return undefined;
+  // }
 
   // تسجيل مستخدم جديد
   async signup(createUserDto: CreateUserDto, ip?: string, userAgent?: string) {
