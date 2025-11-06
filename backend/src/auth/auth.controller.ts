@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Post,
   Req,
   Res,
@@ -22,15 +23,19 @@ import { JwtRefreshPayload } from './types/jwt-refresh-payload.type';
 // import { RemovePasswordInterceptor } from 'src/Interceptors/remove-password.interceptor';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
+import jwtConfig from 'src/config/jwt.config';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
+  // -------------------------: الحصول على أسماء الكوكيز بناءً على البيئة (تطوير أو إنتاج) -------------------------
   private GetCookiesName() {
     const isProduction = process.env.NODE_ENV === 'production';
     return {
@@ -40,7 +45,7 @@ export class AuthController {
   }
   names = this.GetCookiesName();
 
-  // Helper: يحوّل قيم مثل '15m','7d','3600s' أو أرقام إلى milliseconds
+  // -------------------------: يحوّل قيم مثل '15m','7d','3600s' أو أرقام إلى milliseconds -------------------------
   private parseExpiryToMs(value?: string | number, fallback = 15 * 60 * 1000) {
     if (!value) return fallback;
     const v = String(value).trim();
@@ -61,15 +66,15 @@ export class AuthController {
     return fallback;
   }
 
-  private isProd() {
-    return process.env.NODE_ENV === 'production';
-  }
+  // -------------------------
+  // Cookies Options
+  // -------------------------
 
   private cookieOptionsAccess() {
     return {
       httpOnly: true,
       secure: false,
-      domain: this.configService.get<string>('COOKIE_DOMAIN') || 'localhost',
+      domain: this.jwtConfiguration.cookieDomain, //configured domain for cookie
       sameSite: 'none' as const,
       path: '/',
       maxAge:
@@ -83,7 +88,7 @@ export class AuthController {
     return {
       httpOnly: true,
       secure: false,
-      domain: process.env.COOKIE_DOMAIN || 'localhost',
+      domain: this.jwtConfiguration.cookieDomain,
       sameSite: 'none' as const,
       path: '/',
       maxAge:
@@ -144,9 +149,9 @@ export class AuthController {
       return { accessToken, message: 'Refreshed successfully' };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
-        throw new BadRequestException('Invalid refresh token');
+        throw new BadRequestException('Invalid Request');
       }
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException('Unknown error during token refresh');
     }
   }
   @UseGuards(LocalAuthGuard)
