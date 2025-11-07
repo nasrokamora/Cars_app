@@ -3,6 +3,7 @@
 import { CreateCarAction } from "@/app/action/CreateCarAction";
 import { Brand, Car, Category } from "@/app/types/car";
 import { useActionState, useOptimistic } from "react";
+import { toast } from "sonner";
 
 
 interface FormState {
@@ -38,16 +39,16 @@ export default function CreateCarForm({
         }
 
         addOptimisticCar(tempCar);
-        await formAction(FormData);
+         formAction(FormData);
     }
 
 
 
     return (
-        <div className="p-4 bg-gray-50 rounded-lg border flex justify-center items-center flex-col container">
+        <div className="p-4 h-auto bg-gray-50 rounded-lg border flex justify-center items-center flex-col container">
             <form action={handleSubmit} className="space-y-4">
                 <input
-                    name="model"
+                    name="title"
                     placeholder="اسم السيارة"
                     className="border p-2 w-full rounded"
                     required
@@ -87,20 +88,21 @@ export default function CreateCarForm({
                     type="submit"
                     className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-60"
                     disabled={isPending}
+                    onClick={()=> toast('created')}
                 >
                     {isPending ? "جاري الإضافة..." : "إضافة السيارة"}
                 </button>
             </form>
 
             {state.error && <p className="text-red-600 mt-2">{state.error}</p>}
-            {state.success && <p className="text-green-600 mt-2">✅ تمت الإضافة بنجاح</p>}
+            {state.success && toast("تمت إضافة السيارة بنجاح")}
 
             <div className="mt-6">
                 <h2 className="font-semibold mb-2">🚘 سياراتك الحالية:</h2>
                 {optimisticCars.length === 0 ? (
                     <p className="text-gray-500">لا توجد سيارات بعد</p>
                 ) : (
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 flex justify-around items-center gap-3 flex-wrap">
                         {optimisticCars.map((car, index) => (
                             <li key={car.id || index} className="border p-3 rounded bg-white">
                                 <p className="font-medium">{car.title}</p>

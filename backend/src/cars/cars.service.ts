@@ -103,8 +103,8 @@ export class CarsService {
     if (!car) {
       throw new NotFoundException('Car not found');
     }
-    console.log('من التوكن:', ownerId);
-    console.log('من قاعدة البيانات:', car.ownerid);
+    console.log('in the user', ownerId);
+    console.log('in the car', car.ownerid);
 
     if (car.ownerid !== ownerId) {
       throw new ForbiddenException('You are not authorized to update this car');

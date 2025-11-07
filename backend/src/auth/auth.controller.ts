@@ -88,7 +88,7 @@ export class AuthController {
     return {
       httpOnly: true,
       secure: false,
-      domain: this.jwtConfiguration.cookieDomain,
+      domain: this.jwtConfiguration.cookieDomain || 'localhost', //configured domain for cookie
       sameSite: 'none' as const,
       path: '/',
       maxAge:
@@ -120,6 +120,7 @@ export class AuthController {
     return { user, message: 'User registered successfully' };
   }
 
+  isProd = process.env.NODE_ENV === 'production';
   // -------------------------
   // refresh token
   // -------------------------
@@ -171,12 +172,12 @@ export class AuthController {
     );
 
     res.cookie(
-      process.env.ACCESS_COOKIE_NAME || this.names.accessT,
+      this.jwtConfiguration.accessCookieName || this.names.accessT,
       accessToken,
       this.cookieOptionsAccess(),
     );
     res.cookie(
-      process.env.REFRESH_COOKIE_NAME || this.names.refreshT,
+      this.jwtConfiguration.refreshCookieName || this.names.refreshT,
       refreshToken,
       this.cookieOptionsRefresh(),
     );
@@ -197,7 +198,7 @@ export class AuthController {
         const payload = await this.authService[
           'jwtService'
         ].verifyAsync<JwtRefreshPayload>(presented, {
-          secret: process.env.JWT_REFRESH_SECRET,
+          secret: this.jwtConfiguration.refreshSecret,
         });
         const jwtId = payload?.jwtId as string | undefined;
         if (jwtId) {

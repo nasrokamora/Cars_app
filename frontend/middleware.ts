@@ -19,15 +19,19 @@ export async function middleware(req: NextRequest) {
           headers: { cookie: req.headers.get("cookie") || "" },
         }
       );
+      console.log("Refresh response status:", refreshResponse.status);
       if (!refreshResponse.ok) {
+        console.log("Redirecting to login due to failed token refresh");
         return NextResponse.redirect(new URL("/auth/login", req.url));
       }
-      const setCookie = refreshResponse.headers.get("set-cookie");
-      const response = NextResponse.next();
-      if (setCookie) response.headers.set("set-Cookie", setCookie);
-      
-      return response;
 
+      const newCookie = refreshResponse.headers.get("set-cookie");
+      const nextResponse = NextResponse.next();
+      if (newCookie) {
+        nextResponse.headers.set("set-cookie", newCookie);
+      }
+
+      return nextResponse;
     } catch (error) {
       console.error("Error in middleware token refresh:", error);
       return NextResponse.redirect(new URL("/auth/login", req.url));

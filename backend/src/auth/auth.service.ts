@@ -47,10 +47,8 @@ export class AuthService {
 
     const accessSecret = this.jwtConfiguration.secret;
     const refreshSecret = this.jwtConfiguration.refreshSecret;
-    const refreshExpiresIn = this.jwtConfiguration.refreshExpiresIn;
-    // const accessSecret = this.configService.get<string>('JWT_SECRET');
 
-    if (!refreshSecret || !refreshExpiresIn) {
+    if (!refreshSecret || !refreshSecret) {
       throw new Error(
         'JWT_REFRESH_SECRET or JWT_REFRESH_EXPIRES_IN is not defined in configuration',
       );
@@ -164,7 +162,7 @@ export class AuthService {
     let payload: JwtRefreshPayload;
     try {
       payload = await this.jwtService.verifyAsync(presentedToken, {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: this.jwtConfiguration.refreshSecret,
       });
       const userId = payload.sub;
       const jwtId = payload.jwtId as string | undefined;

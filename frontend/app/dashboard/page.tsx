@@ -36,7 +36,7 @@ export default async function DashboardHeader() {
 const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars(accessToken)]);
 
   return (
-    <header className="sticky  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-screen container">
+    <header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           Dashboard

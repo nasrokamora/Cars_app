@@ -15,28 +15,11 @@ interface Users {
 export default async function LoginSignUpButton() {
     const cookieStore = cookies();
     const accessToken = (await cookieStore).get("access_token")?.value;
-    let user: { username?: string, email?: string } | null = null;
-    if (accessToken) {
-        try {
-            const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/me`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`
-                },
-                cache: "no-store"
-            })
-            if (response.ok) {
-                user = await response.json();
-            }
-        } catch (err) {
-            throw new Error("Failed to get user" + err);
-        }
-    }else{
-        user = null;
-    }
+
+
     return (
         <div className="  justify-center items-center gap-3 ">
-            {!accessToken && !user ? (
+            {!accessToken ? (
                 <div>
 
                     <div className="sm:flex hidden flex-1 gap-3">
@@ -80,7 +63,8 @@ export default async function LoginSignUpButton() {
 
             ) : (
                 <div>
-                    <UserProfile user={user as Users} />
+                    {/* <UserProfile user={user as Users} /> */}
+                    login
                 </div>
             )}
         </div>
