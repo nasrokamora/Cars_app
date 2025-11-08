@@ -11,9 +11,9 @@ export class ProfileService {
       where: { id: userId },
       include: {
         cars: {
-          include: {
-            category: true,
+          select: {
             brand: true,
+            category: true,
           },
         },
       },

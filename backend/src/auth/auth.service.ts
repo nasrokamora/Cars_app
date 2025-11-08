@@ -48,9 +48,9 @@ export class AuthService {
     const accessSecret = this.jwtConfiguration.secret;
     const refreshSecret = this.jwtConfiguration.refreshSecret;
 
-    if (!refreshSecret || !refreshSecret) {
+    if (!accessSecret || !refreshSecret) {
       throw new Error(
-        'JWT_REFRESH_SECRET or JWT_REFRESH_EXPIRES_IN is not defined in configuration',
+        'JWT_ACCESS_SECRET or JWT_REFRESH_SECRET is not defined in configuration',
       );
     }
 

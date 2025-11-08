@@ -11,17 +11,20 @@ import {
 // import LogoutButton from "../(auth)/auth/logout/Logout"
 import { LogoutAction } from "../api/auth/logout/action"
 // import AddCars from "../components/AddCars/AddCars"
-import { cookies } from "next/headers"
-import { getBrands, getCategories } from "../libs/api"
+// import { cookies } from "next/headers"
+import { fetchWithRefresh, getBrands, getCategories } from "../libs/api"
 import CreateCarForm from "../components/CreateCarForm/CreateCarForm"
 import CarsList from "../components/UserProfile/CarList"
 
-async function getUserCars(accessToken: string) {
-  const res = await fetch(`${process.env.NEXT_NEST_API_URL}/profile`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+async function getUserCars(accessToken?: string) {
+  const res = await fetchWithRefresh(`${process.env.NEXT_NEST_API_URL}/profile`, {
+    method: "GET",
     cache: "no-store",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }
   });
   if (!res.ok) return [];
   const user = await res.json();
@@ -30,10 +33,10 @@ async function getUserCars(accessToken: string) {
 
 export default async function DashboardHeader() {
   // const data = await getProfile();
-  const accessToken = (await cookies()).get("access_token")?.value;
-  if (!accessToken) throw new Error(`Unauthorized`);
+  // const accessToken = (await cookies()).get("access_token")?.value;
+  // if (!accessToken) throw new Error(`Unauthorized`);
 
-const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars(accessToken)]);
+const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars()]);
 
   return (
     <header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">

@@ -12,10 +12,8 @@ export async function LoginAction(formData: FormData) {
     body: JSON.stringify({ email, password }),
     credentials: "include",
   });
-  const text = await response.text();
   if (!response.ok) {
-    console.error("Login failed:", text);
-    throw new Error("Failed to login" + text);
+    redirect("/auth/login");
   }
   const setCookie = response.headers.get("Set-cookie");
   if (setCookie) {
