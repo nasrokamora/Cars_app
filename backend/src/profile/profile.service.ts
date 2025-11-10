@@ -9,9 +9,12 @@ export class ProfileService {
   async getProfile(userId: string) {
     return await this.prisma.user.findUnique({
       where: { id: userId },
-      include: {
+      select: {
         cars: {
           select: {
+            title: true,
+            price: true,
+            discription: true,
             brand: true,
             category: true,
           },

@@ -15,9 +15,10 @@ import { LogoutAction } from "../api/auth/logout/action"
 import { fetchWithRefresh, getBrands, getCategories } from "../libs/api"
 import CreateCarForm from "../components/CreateCarForm/CreateCarForm"
 import CarsList from "../components/UserProfile/CarList"
+import { cookies } from "next/headers"
 
 async function getUserCars(accessToken?: string) {
-  const res = await fetchWithRefresh(`${process.env.NEXT_NEST_API_URL}/profile`, {
+  const res = await fetch(`${process.env.NEXT_NEST_API_URL}/api/proxy/profile`, {
     method: "GET",
     cache: "no-store",
     credentials: "include",
@@ -26,22 +27,24 @@ async function getUserCars(accessToken?: string) {
       Authorization: `Bearer ${accessToken}`,
     }
   });
-  if (!res.ok) return [];
+  if (!res.ok) return [];                                                     //  مازال غالط ال function ;كاملة 
   const user = await res.json();
   return user.cars ?? [];
 }
 
 export default async function DashboardHeader() {
-  // const data = await getProfile();
+  const data = await getUserCars();
   // const accessToken = (await cookies()).get("access_token")?.value;
   // if (!accessToken) throw new Error(`Unauthorized`);
 
-const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars()]);
+  console.log(data);
 
+const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars()]);
   return (
-    <header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
+
+<header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+console.log(cars);        <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           Dashboard
         </h1>
 

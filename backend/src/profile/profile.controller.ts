@@ -13,6 +13,6 @@ export class ProfileController {
   @UseInterceptors(RemovePasswordInterceptor)
   @Get()
   async getProfile(@User() user: AuthUser) {
-    return await this.profileService.getProfile(user.username);
+    return await this.profileService.getProfile(user.id);
   }
 }

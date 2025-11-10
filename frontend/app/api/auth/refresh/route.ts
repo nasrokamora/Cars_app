@@ -5,47 +5,32 @@ export async function POST() {
   const cookieStore = cookies();
   const refreshToken = (await cookieStore).get("refresh_token")?.value;
 
-  if (!refreshToken) {
-    return NextResponse.json(
-      { error: "No access token provided" },
-      { status: 401 }
-    );
+  if(!refreshToken){
+    return NextResponse.json({error:"refresh token not found"}, {status:401})
   }
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_NEST_API_URL}/auth/refresh`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          cookie: `refresh_token=${refreshToken}`,
-        },
-        credentials: "include",
-      }
-    );
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Failed to refresh token" },
-        { status: response.status }
-      );
+
+
+  const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/refresh`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "cookie":`refresh_token=${refreshToken}`
     }
-    const data = await response.json();
-    const nextResponse = NextResponse.json(
-      { accessToken: data.accessToken },
-      { status: response.status }
-    );
-    const setCookie = response.headers.get("set-cookie");
-    if (setCookie) {
-      nextResponse.headers.set("set-cookie", setCookie);
-    }
-    return nextResponse;
-  } catch (e) {
-    console.error("Error refreshing token:", e);
-    return NextResponse.json(
-      { error: "Failed to refresh token" },
-      { status: 500 }
-    );
+  })
+
+  if(!response.ok){// لو لم يكن الرد ناجح
+    const res = NextResponse.json({error:"refresh token not valid"}, {status:401})
+    // res.cookies.delete("refresh_token")// مسح الكوكي
+    res.cookies.delete("access_token")// مسح الكوكي
+    return res
   }
+
+  const setCookie = response.headers.get("set-cookie");// التقاط الكوكي
+  const responseSuccess = NextResponse.json({success:true});// الرد الناجح
+  if(setCookie){
+    responseSuccess.headers.set("set-cookie", setCookie)// تعيين الكوكي
+  } 
+  return responseSuccess;
 }
 
 // // import { NextResponse } from "next/server";
