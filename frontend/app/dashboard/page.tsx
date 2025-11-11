@@ -12,39 +12,48 @@ import {
 import { LogoutAction } from "../api/auth/logout/action"
 // import AddCars from "../components/AddCars/AddCars"
 // import { cookies } from "next/headers"
-import { fetchWithRefresh, getBrands, getCategories } from "../libs/api"
+import { getBrands, getCategories } from "../libs/api"
 import CreateCarForm from "../components/CreateCarForm/CreateCarForm"
 import CarsList from "../components/UserProfile/CarList"
 import { cookies } from "next/headers"
+import { getAccess } from "../libs/get"
+import { fetchWithRefresh } from "../libs/fetch"
+// import { cookies } from "next/headers"
 
-async function getUserCars(accessToken?: string) {
-  const res = await fetch(`${process.env.NEXT_NEST_API_URL}/api/proxy/profile`, {
+async function getUserProfile() {
+
+  const res= await fetchWithRefresh(`http://localhost:3001/profile`, {
+    // cache: "no-store",
     method: "GET",
-    cache: "no-store",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    }
-  });
-  if (!res.ok) return [];                                                     //  مازال غالط ال function ;كاملة 
-  const user = await res.json();
-  return user.cars ?? [];
+    },
+    credentials: "include",
+  })
+
+  // if (res.status === 401) {
+  //   console.error("Unauthorized:", res.statusText);
+  // }
+  const data = await res.json();
+
+
+  return data
+
 }
 
 export default async function DashboardHeader() {
-  const data = await getUserCars();
-  // const accessToken = (await cookies()).get("access_token")?.value;
-  // if (!accessToken) throw new Error(`Unauthorized`);
-
+  const [brands, categories, data] = await Promise.all([getBrands(), getCategories(), getUserProfile()]);
   console.log(data);
 
-const [brands, categories, cars] = await Promise.all([getBrands(), getCategories(), getUserCars()]);
+
+
+
+
   return (
 
-<header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
+    <header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-console.log(cars);        <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold">
           Dashboard
         </h1>
 
@@ -75,13 +84,13 @@ console.log(cars);        <h1 className="text-2xl font-bold bg-gradient-to-r fro
       </div>
 
 
-        <div>
-          <CreateCarForm brand={brands} category={categories} initialCars={cars} />
-        </div>
-        <div className='mt-10'>
+      {/* <div>
+        <CreateCarForm brand={brands} category={categories} initialCars={data} />
+      </div> */}
+      <div className='mt-10'>
 
-        <CarsList cars={cars} />
-        </div>
+        <CarsList data={data} />
+      </div>
       {/* <div className=" flex flex-col mt-10 container ml-5 border rounded-md border-black w-fit p-3 cursor-pointer hover:bg-black hover:text-white">
         <AddCars />
         <div>
@@ -96,6 +105,6 @@ console.log(cars);        <h1 className="text-2xl font-bold bg-gradient-to-r fro
         ))}
         </div>
       </div> */}
-    </header>
+    </header >
   )
 }

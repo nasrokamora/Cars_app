@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 
+
 export async function getBrands() {
   try {
     const response = await fetch(`${process.env.NEXT_NEST_API_URL}/brands`, {
@@ -35,31 +36,27 @@ export async function getCategories() {
   }
 }
 
-export async function fetchWithRefresh(url: string, options?: RequestInit) {
-  const accessToken = (await cookies()).get("access_token")?.value;
-  const response = await fetch(url, {
-    ...options,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    }
-  });
-  if (!accessToken && response.status === 401) {
-    // If unauthorized, try to refresh the token
-    const refreshResponse = await fetch(
-      `http://localhost:3000/api/auth/refresh`,
-      {
-        method: "POST",
-        credentials: "include",
-      }
-    );
-    if (!refreshResponse.ok) {
-      throw new Error("Unauthorized");
-    }
-    return fetch(url, {
-      ...options,
-      credentials: "include",
-    });
-  }
-  return response;
-}
+// export async function fetchWithRefresh(url: string, options?: RequestInit) {
+//   const cookieStore = cookies();
+//   const accessToken = (await cookieStore).get("accessToken");
+//   const res = await fetch(url, {
+//     ...options,
+//     credentials: "include",
+//     headers: {
+//       "Content-Type": "application/json",
+//     }
+//   });
+//   if (res.status !== 401 ) return res;
+
+//   const refreshResponse = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/refresh`, {
+//     method: "POST",
+//     credentials: "include",
+//   })
+//     if(!refreshResponse.ok) return refreshResponse
+
+//     return fetch(url,{
+//       ...options,
+//       credentials: "include",
+//     })
+    
+// }
