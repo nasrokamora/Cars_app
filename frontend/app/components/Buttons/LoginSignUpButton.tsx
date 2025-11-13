@@ -4,30 +4,6 @@ import { User, LogIn, } from "lucide-react"
 // import { HoverButton } from "./HoverButton";
 // import { cookies } from "next/headers";
 
-// import UserProfile from "../UserProfile/UserProfile";
-
-// interface Users {
-//     username: string,
-//     email: string,
-//     id: string
-// }
-
-// async function getUserProfile(){
-//     const response = await fetch(`${process.env.NEXT_BASE_URL}/api/proxy/profile`, {
-//         method: "GET",
-//         cache: "no-store",
-//         headers:{
-//             "Content-Type": "application/json",
-//         }
-//     })
-
-//     if (response.status === 401) {
-//         console.error("Unauthorized:", response.statusText);
-//     }
-//     const data = await response.json();
-
-//   return data;
-// } 
 
 export default async function LoginSignUpButton() {
     // const dataUser = await getUserProfile();

@@ -18,34 +18,27 @@ import CarsList from "../components/UserProfile/CarList"
 import { cookies } from "next/headers"
 import { getAccess } from "../libs/get"
 import { fetchWithRefresh } from "../libs/fetch"
-// import { cookies } from "next/headers"
 
-async function getUserProfile() {
-
-  const res= await fetchWithRefresh(`http://localhost:3001/profile`, {
-    // cache: "no-store",
+export default async function DashboardHeader() {
+const cookieStore = cookies();
+  const accessToken = (await cookieStore).get("access_token")?.value;
+  const response = await fetchWithRefresh(`${process.env.NEXT_NEST_API_URL}/profile`, {
+    cache: "no-store",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
     credentials: "include",
   })
-
-  // if (res.status === 401) {
-  //   console.error("Unauthorized:", res.statusText);
-  // }
-  const data = await res.json();
-
-
-  return data
-
+  if (!response.ok) {
+  console.error("Request failed:", response.statusText);
+  throw new Error(`HTTP error ${response.status}`);
 }
-
-export default async function DashboardHeader() {
-  const [brands, categories, data] = await Promise.all([getBrands(), getCategories(), getUserProfile()]);
-  console.log(data);
+  const data = await response.json()
 
 
+console.log(data)
 
 
 

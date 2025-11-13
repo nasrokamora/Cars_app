@@ -75,7 +75,7 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       domain: this.jwtConfiguration.cookieDomain, //configured domain for cookie
-      sameSite: 'none' as const,
+      sameSite: this.isProd ? ('lax' as const) : ('none' as const),
       path: '/',
       maxAge:
         this.parseExpiryToMs(
@@ -137,7 +137,6 @@ export class AuthController {
 
     try {
       // عادةً نستخرج userId من الـ JWT payload أو من DB
-
       const { accessToken, refreshToken: newRefresh } =
         await this.authService.refreshTokens(
           presented,
@@ -155,6 +154,9 @@ export class AuthController {
       throw new UnauthorizedException('Unknown error during token refresh');
     }
   }
+  // -------------------------
+  // login
+  // -------------------------
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
