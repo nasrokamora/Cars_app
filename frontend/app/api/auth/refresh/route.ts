@@ -1,37 +1,61 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 
 export async function POST() {
-  const cookieStore = cookies();
-  const refreshToken = (await cookieStore).get("refresh_token")?.value;
-
-  if(!refreshToken){
-    return NextResponse.json({error:"refresh token not found"}, {status:401})
-  }
-
-
-  const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/refresh`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "cookie":`refresh_token=${refreshToken}`
+  try {
+    const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials:"include"
+    })
+    if(!response.ok){
+       throw new Error("refresh token not valid")
     }
-  })
-
-  if(!response.ok){// لو لم يكن الرد ناجح
-    const res = NextResponse.json({error:"refresh token not valid"}, {status:401})
-    // res.cookies.delete("refresh_token")// مسح الكوكي
-    res.cookies.delete("access_token")// مسح الكوكي
-    return res
+    const cookieStore = cookies();
+    const accessToken = (await cookieStore).get("access_token")?.value;
+    return new Response('refresh',{
+      status:200,
+      headers:{
+        'Set-Cookie':`access_token=${accessToken}`
+      }
+    })
+  } catch (error) {
+    console.log (error);
   }
-
-  const setCookie = response.headers.get("set-cookie");// التقاط الكوكي
-  const responseSuccess = NextResponse.json({success:true});// الرد الناجح
-  if(setCookie){
-    responseSuccess.headers.set("set-cookie", setCookie)// تعيين الكوكي
-  } 
-  return responseSuccess;
 }
+
+// // export async function POST() {
+// //   const cookieStore = cookies();
+// //   const refreshToken = (await cookieStore).get("refresh_token")?.value;
+
+// //   if(!refreshToken){
+// //     return NextResponse.json({error:"refresh token not found"}, {status:401})
+// //   }
+
+
+// //   const response = await fetch(`${process.env.NEXT_NEST_API_URL}/auth/refresh`,{
+// //     method:"POST",
+// //     headers:{
+// //       "Content-Type":"application/json",
+// //       "cookie":`refresh_token=${refreshToken}`
+// //     }
+// //   })
+
+// //   if(!response.ok){// لو لم يكن الرد ناجح
+// //     const res = NextResponse.json({error:"refresh token not valid"}, {status:401})
+// //     // res.cookies.delete("refresh_token")// مسح الكوكي
+// //     res.cookies.delete("access_token")// مسح الكوكي
+// //     return res
+// //   }
+
+// //   const setCookie = response.headers.get("set-cookie");// التقاط الكوكي
+// //   const responseSuccess = NextResponse.json({success:true});// الرد الناجح
+// //   if(setCookie){
+// //     responseSuccess.headers.set("set-cookie", setCookie)// تعيين الكوكي
+// //   } 
+// //   return responseSuccess;
+// // }
 
 // // import { NextResponse } from "next/server";
 

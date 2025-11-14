@@ -146,7 +146,7 @@ export class AuthController {
       res.cookie(this.names.accessT, accessToken, this.cookieOptionsAccess());
       res.cookie(this.names.refreshT, newRefresh, this.cookieOptionsRefresh());
 
-      return { accessToken, message: 'Refreshed successfully' };
+      return { newAccessToken: accessToken, message: 'Refreshed successfully' };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw new BadRequestException('Invalid Request');

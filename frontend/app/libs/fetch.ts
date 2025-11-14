@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 
 export async function fetchWithRefresh(url: string, options?: RequestInit) {
   let response = await fetch(url, {
@@ -14,7 +13,7 @@ export async function fetchWithRefresh(url: string, options?: RequestInit) {
   if (response.status === 401) {
     try {
       const responseRefresh = await fetch(
-        `${process.env.NEXT_NEST_API_URL}/auth/refresh`,
+        `${process.env.NEXT_BASE_URL}/api/refresh`,
         {
           method: "POST",
           credentials: "include",
@@ -24,14 +23,7 @@ export async function fetchWithRefresh(url: string, options?: RequestInit) {
         }
       );
       if (responseRefresh.status === 200) {
-        const setCookie = responseRefresh.headers
-          .get("set-cookie")
-          ?.split(";")[0]
-          .split("=")[1];
-        if (setCookie) {
-          const cookieStore = cookies();
-          (await cookieStore).set("access_token", setCookie);
-        }
+        console.log("refreshed token");
       }
     } catch (error) {
       console.log(error);
