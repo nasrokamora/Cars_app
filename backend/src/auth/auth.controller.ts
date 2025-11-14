@@ -75,7 +75,7 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       domain: this.jwtConfiguration.cookieDomain, //configured domain for cookie
-      sameSite: this.isProd ? ('lax' as const) : ('none' as const),
+      sameSite: this.isProd ? ('none' as const) : ('lax' as const),
       path: '/',
       maxAge:
         this.parseExpiryToMs(
@@ -89,7 +89,7 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       domain: this.jwtConfiguration.cookieDomain || 'localhost', //configured domain for cookie
-      sameSite: 'none' as const,
+      sameSite: this.isProd ? ('lax' as const) : ('none' as const),
       path: '/',
       maxAge:
         this.parseExpiryToMs(process.env.JWT_REFRESH_EXPIRES_IN) ||

@@ -20,7 +20,7 @@ import { getAccess } from "../libs/get"
 import { fetchWithRefresh } from "../libs/fetch"
 
 export default async function DashboardHeader() {
-const cookieStore = cookies();
+  const cookieStore = cookies();
   const accessToken = (await cookieStore).get("access_token")?.value;
   const response = await fetchWithRefresh(`${process.env.NEXT_NEST_API_URL}/profile`, {
     cache: "no-store",
@@ -32,7 +32,7 @@ const cookieStore = cookies();
     credentials: "include",
   })
   if (!response.ok) {
-  console.error("Request failed:", response.statusText);
+  console.error("Request failed:", response.status);
   throw new Error(`HTTP error ${response.status}`);
 }
   const data = await response.json()

@@ -43,6 +43,7 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: userId,
       email: email ?? '',
+      jwtId,
     };
 
     const accessSecret = this.jwtConfiguration.secret;

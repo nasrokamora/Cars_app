@@ -1,7 +1,10 @@
 "use server";
 
+import { cookies } from "next/headers";
+
 
 export async function fetchWithRefresh(url: string, options?: RequestInit) {
+
   let response = await fetch(url, {
     ...options,
     credentials: "include", // include cookies in the request
@@ -13,7 +16,7 @@ export async function fetchWithRefresh(url: string, options?: RequestInit) {
   if (response.status === 401) {
     try {
       const responseRefresh = await fetch(
-        `${process.env.NEXT_BASE_URL}/api/refresh`,
+        `${process.env.NEXT_BASE_URL}/api/auth/refresh`,
         {
           method: "POST",
           credentials: "include",
