@@ -12,30 +12,30 @@ import {
 import { LogoutAction } from "../api/auth/logout/action"
 // import AddCars from "../components/AddCars/AddCars"
 // import { cookies } from "next/headers"
-import { getBrands, getCategories } from "../libs/api"
-import CreateCarForm from "../components/CreateCarForm/CreateCarForm"
+// import { getBrands, getCategories } from "../libs/api"
+// import CreateCarForm from "../components/CreateCarForm/CreateCarForm"
 import CarsList from "../components/UserProfile/CarList"
 import { cookies } from "next/headers"
-import { getAccess } from "../libs/get"
+// import { getAccess } from "../libs/get"
 import { fetchWithRefresh } from "../libs/fetch"
 
 export default async function DashboardHeader() {
-  const cookieStore = cookies();
-  const accessToken = (await cookieStore).get("access_token")?.value;
+  // const cookieStore = cookies();
+  // const accessToken = (await cookieStore).get("access_token")?.value;
   const response = await fetchWithRefresh(`${process.env.NEXT_NEST_API_URL}/profile`, {
     cache: "no-store",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      // Authorization: `Bearer ${accessToken}`,
     },
     credentials: "include",
   })
-  if (!response.ok) {
-  console.error("Request failed:", response.status);
-  throw new Error(`HTTP error ${response.status}`);
-}
   const data = await response.json()
+  if (!response.ok) {
+  console.error(response.status);
+  console.error();
+}
 
 
 console.log(data)
@@ -44,7 +44,7 @@ console.log(data)
 
   return (
 
-    <header className="sticky h-auto  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
+    <header className=" h-screen  w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  container">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <h1 className="text-2xl font-bold">
           Dashboard
