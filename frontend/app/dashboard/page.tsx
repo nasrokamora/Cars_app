@@ -27,7 +27,7 @@ export default async function DashboardHeader() {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      // Authorization: `Bearer ${accessToken}`,
+
     },
     credentials: "include",
   })

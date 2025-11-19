@@ -14,7 +14,6 @@ export async function fetchWithRefresh(url: string, options?: RequestInit) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-
     },
   });
   if (response.status === 401) {
@@ -29,17 +28,22 @@ export async function fetchWithRefresh(url: string, options?: RequestInit) {
           },
         }
       );
+      // const setCookie = responseRefresh.headers.get("Set-Cookie");
+      const newAccessToken = await responseRefresh.json();
+
+      // const newAccessToken = await responseRefresh.json();
+      // const cookieStore = cookies();
+      // const newAccessToken=  (await cookieStore).get("access_token")?.value;
+      // (await cookieStore).set("Set-Cookie", newAccessToken || "");
+
       if (responseRefresh.status === 200) {
-        const newAccessToken = await responseRefresh.json();
-        const cookieStore = cookies();
-        (await cookieStore).set("access_token", newAccessToken.accessToken);
 
         response = await fetch(url, {
           ...options,
           credentials: "include", // include cookies in the request
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${newAccessToken.accessToken}`,
+            Authorization: `Bearer ${newAccessToken}`,
           },
         });
         return response;
