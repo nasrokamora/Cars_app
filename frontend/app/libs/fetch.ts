@@ -29,11 +29,11 @@ export async function fetchWithRefresh(url: string, options?: RequestInit) {
         }
       );
       // const setCookie = responseRefresh.headers.get("Set-Cookie");
-      const newAccessToken = await responseRefresh.json();
-
+      // const newAccessToken = await responseRefresh.json();
+      
       // const newAccessToken = await responseRefresh.json();
       // const cookieStore = cookies();
-      // const newAccessToken=  (await cookieStore).get("access_token")?.value;
+      const newAccessToken=  (await cookieStore).get("access_token")?.value;
       // (await cookieStore).set("Set-Cookie", newAccessToken || "");
 
       if (responseRefresh.status === 200) {
