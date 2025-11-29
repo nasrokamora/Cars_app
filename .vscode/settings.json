@@ -1,4 +1,5 @@
 {
     "Codegeex.RepoIndex": true,
-    "Codegeex.GenerationPreference": "automatic"
+    "Codegeex.GenerationPreference": "automatic",
+    "prisma.pinToPrisma6": true
 }
