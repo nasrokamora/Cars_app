@@ -1,13 +1,13 @@
 "use server";;
 import { cookies } from "next/headers";
 
-let BASE_URL;
+// let BASE_URL;
 
-BASE_URL = process.env.NEXT_NEST_API_URL;
+// BASE_URL = process.env.NEXT_NEST_API_URL;
 
 export async function FetchWithRefresh(url: string, options: RequestInit) {
-  // const cookieStore = cookies();
-  // const accessToken = (await cookieStore).get("access_token")?.value;
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get("access_token")?.value;
   let response = await fetch(url,{
     ...options,
     headers:{
@@ -15,4 +15,6 @@ export async function FetchWithRefresh(url: string, options: RequestInit) {
       // "Authorization": `Bearer ${accessToken}`,
     }
   })
+
+  
 }
